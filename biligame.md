@@ -102,9 +102,9 @@
 
 用了bootstrap啊，[bootstrap菜鸟教程](https://www.runoob.com/bootstrap/bootstrap-tutorial.html) 
 
-bootstrap代码：<var> <pre> <pre class="pre-scrollable"> <code>
+bootstrap代码：`<var> <pre> <pre class="pre-scrollable"> <code>`
 
-轮播 <ol>
+轮播 `<ol>`
 
 [how can I move a rows div into another row](https://stackoverflow.com/questions/34793979/bootstrap-how-can-i-move-a-rows-div-into-another-row) （不好用）
 
