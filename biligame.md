@@ -1,6 +1,10 @@
 # biligame教程整理
 
+前置知识：[帮助:目录](https://wiki.biligame.com/wiki/%E5%B8%AE%E5%8A%A9:%E7%9B%AE%E5%BD%95) 
+
 ### `[[]]`语法一览
+
+可以缺省一些条件
 
 ```javascript
 [[分类:分类名词]]
@@ -20,14 +24,16 @@
 {{板块|xxx}}也是一个模板，只是官方有比较完善的懒人包
 ```
 
-使用管道变量：`{{{name|}}}`？
+使用管道变量：`{{{name1|name2|name3...}}}`，多个变量之间使用管道符`|`进行分隔。管道变量相当于函数传参。
 
-## 解析函数
+## SMW、解析函数
 
 - 用法
 
   ```javascript
-  {{#function:}}
+  {{#function:
+  ...
+  }}
   ```
 
 [帮助:SMW](https://wiki.biligame.com/wiki/%E5%B8%AE%E5%8A%A9:SMW) 使用SMW语义来处理一些数据向的内容。
@@ -40,7 +46,7 @@
 
 [semantic-mediawiki.org](https://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki/zh-hans) 
 
-`#set` `#ask` `#show` `#info` `#switch`
+常用的`function`有`#set` `#ask` `#show` `#info` `#switch` `#widget`等，可以等到用的时候再了解它们。
 
 ```javascript
  {{#set:
@@ -56,39 +62,39 @@
 
 ```javascript
 {{#switch: 比较字串
- | 情况字串1 = 返回结果1
- | 情况字串2 = 返回结果2
- | ...
- | 情况字串n = 返回结果n
- | 默认结果
+| 情况字串1 = 返回结果1
+| 情况字串2 = 返回结果2
+| ...
+| 情况字串n = 返回结果n
+| 默认结果
 }}
 ```
 
 ```javascript
 {{#if: 测试字串 
- | 字串非空输出值 
- | 字串空（或只有空白字符）输出值 
+| 字串非空输出值 
+| 字串空（或只有空白字符）输出值 
 }}
 {{#if: 参数1 
- | 参数2 
- | 参数3 
+| 参数2 
+| 参数3 
 }}
 ```
 
 ```javascript
 格式
 {{#arraymap: 字串
-  | 分隔符（默认为“,”） 
-  | 代号 
-  | 格式字串 
-  | 输出分隔符（默认为“, ”，注意有空格） 
+| 分隔符（默认为“,”） 
+| 代号 
+| 格式字串 
+| 输出分隔符（默认为“, ”，注意有空格） 
 }}
 例子
 {{#arraymap:22;33;小电视
-  |;
-  |@
-  |<font color=red>@</font>
-  |，
+|;
+|@
+|<font color=red>@</font>
+|，
  }} → 22，33，小电视
 ```
 
@@ -108,7 +114,35 @@ bootstrap代码：`<var> <pre> <pre class="pre-scrollable"> <code>`
 
 [how can I move a rows div into another row](https://stackoverflow.com/questions/34793979/bootstrap-how-can-i-move-a-rows-div-into-another-row) （不好用）
 
-class: `col-sm-3`, `col-sm-12`, `xs, sm, md, lg, xl`
+class: `col-sm-3`, `col-sm-12`, `xs, sm, md, lg, xl` 
+
+在编辑页面时，可以通过 SMW 提供的function来使得部分 CSS 样式附加在该页面上，例如：
+
+```javascript
+{{#css:
+.p {
+    height: 20px;
+}
+}}
+```
+
+但当页面作为模板时，不建议这样使用，这个 CSS 会复制很多份，建议放在 MediaWiki 里，通过 ResourceLoader 引用。
+
+## JS
+
+`MediaWiki:name.js`，支持 jQuery。
+
+## ResourceLoader
+
+[用法](https://wiki.biligame.com/wiki/%E6%A8%A1%E6%9D%BF:ResourceLoader)，例如
+
+```javascript
+{{ResourceLoader|MediaWiki:Gacha|true}}
+{{ResourceLoader|MediaWiki:Gacha|false|text/javascript}}
+{{ResourceLoader|MediaWiki:Gacha.js}}
+```
+
+这个，有半小时的缓存期，因此建议本地调试后再放到 wiki 中。
 
 ## 表格
 
@@ -168,6 +202,8 @@ class: `col-sm-3`, `col-sm-12`, `xs, sm, md, lg, xl`
   |额外属性1内容=
   }}
   ```
+
+- 注意，预览结果若不是预期的效果，可能是在该换行的地方不换行，不该换行的地方换行。
 
 ## 页面快捷键
 
