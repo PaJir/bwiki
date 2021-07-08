@@ -142,7 +142,11 @@ class: `col-sm-3`, `col-sm-12`, `xs, sm, md, lg, xl`
 {{ResourceLoader|MediaWiki:Gacha.js}}
 ```
 
-这个，有半小时的缓存期，因此建议本地调试后再放到 wiki 中。
+这个，有半小时的缓存期，因此建议本地调试后再放到 wiki 中。下面的 Widget 没有缓存期，但性能低一些。
+
+## Widget
+
+[动态查询](https://wiki.biligame.com/wiki/%E5%8A%A8%E6%80%81%E6%9F%A5%E8%AF%A2) 
 
 ## 表格
 
