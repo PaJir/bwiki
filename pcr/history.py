@@ -8,7 +8,6 @@ colors = ['',
           'style="background-color: yellow" ',
           'style="background-color: yellow" ',
           'style="background-color: yellow" ',
-          'style="background-color: yellow" ',
           'style="background-color: pink" ',
           'style="background-color: pink" ',
           'style="background-color: pink" ',
@@ -34,12 +33,11 @@ colors = ['',
           'style="background-color: lightgray" ']
 
 laters = ['',
-    '|-style="background-color: yellow"\n!rowspan=5|加倍<br>起止默认<br>5:00~4:59\n',
+    '|-style="background-color: yellow"\n!rowspan=4|加倍<br>起止默认<br>5:00~4:59\n',
     '|-\n',
     '|-\n',
     '|-\n',
-    '|-\n',
-    '|-style="background-color: pink"\n!rowspan=2|卡池\n',
+    '|-style="background-color: pink"\n!rowspan=3|卡池\n',
     '|-\n',
     '|-\n',
     '|-style="background-color: lightgreen"\n!rowspan=2|活动\n',
@@ -66,8 +64,8 @@ laters = ['',
     ]
 
 def read_xlsx_output_txt():
-    wb = openpyxl.load_workbook("./history.xlsx")
-    sheetname = wb.sheetnames[0]
+    wb = openpyxl.load_workbook("./history2.xlsx")
+    sheetname = wb.sheetnames[1]
     sheet = wb[sheetname]
     rows = sheet.max_row
     cols = sheet.max_column
@@ -99,7 +97,7 @@ def read_xlsx_output_txt():
                 elif val is None:
                     wf.write("|colspan=" + str(sum) + "|\n")
                 else:
-                    wf.write("|" + colors[row] + "colspan=" + str(sum) + "|" + val + "\n")
+                    wf.write("|" + colors[row] + "colspan=" + str(sum) + "|" + str(val) + "\n")
                 col = col + col_sum
             wf.write(laters[row])
 

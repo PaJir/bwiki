@@ -1,4 +1,4 @@
-# 更新日志：装备基本按照游戏内排序，且概率大的在前面；支持H本角色碎片；修改编号规则
+# 地图掉落数据
 import sqlite3
 
 areaid      = "130"                    # 110 for Normal, 120 for Hard

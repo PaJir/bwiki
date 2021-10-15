@@ -1,6 +1,7 @@
-# 更新日志：装备基本按照游戏内排序，且概率大的在前面；支持H本角色碎片；修改编号规则
+# 装备数据
 import sqlite3
 import io
+import openpyxl
 
 db_name = "./redive_cn0925.db"
 db_name_jp = "./redive_jp0925.db"
@@ -24,15 +25,15 @@ new_craft = ["太阳剑", "公主短剑", "狮子王的护臂", "天使弓", "�
     "悲叹河之爪", "盖亚之斧", "亚特兰蒂斯之杖", "雷霆之杖", "愤怒女王的礼裙", "煌金王铠", "魔导王长袍", "鬼焰斗衣", 
     "血红宝石高跟鞋", "皇家守卫帽"]
 
-
 def write_same(data):
     s = ""
     s += str(data[1]) + " "
     for i in range(37):
         s += str(data[i]).replace("\\n","<br/>").replace(" ", "") + " "
     s += str(lowest_rank(data[0])) + " "
+    s += str(lowest_map(data[0])) + " "
     return s
-
+# 初始RANK
 def lowest_rank(id):
     id = str(id)
     sql_rank = """
@@ -45,7 +46,19 @@ LIMIT 1"""
     all_data = cursor_jp.fetchone()
     assert all_data != None
     return all_data[0]
-
+#初始地图
+def lowest_map(id):
+    id = str(id)
+    wb = openpyxl.load_workbook("./read_db_equipment.xlsx")
+    sheetname = wb.sheetnames[0]
+    sheet = wb[sheetname]
+    rows = sheet.max_row
+    for row in range(2, rows + 1):
+        m = sheet.cell(row, 1).value
+        c = sheet.cell(row, 3).value
+        if id[2:] in c:
+            return m.split("-")[0]
+    return "badbadbadbadbadofmap"
 def equipment_craft():
     f = open("equip_data_craft_rate.txt", "w")
     # 7 + 15 + 15 + 21
@@ -67,15 +80,17 @@ from equipment_data d join equipment_enhance_rate r on d.equipment_id = r.equipm
     low_data = cursor.fetchall()
     for data in all_data:
         f.write(write_same(data))
+        # 合成价格
         f.write(str(data[37]) + " ")
+        # 合成材料
         craft = ""
-        prob = ""
+        # prob = ""
         for i in range(38, 58, 2):
             if str(data[i]) == "0":
                 break
-            craft += str(data[i]) + ","
-            prob += str(data[i+1]) + ","
-        f.write(craft[:-1] + " " + prob[:-1] + " \n")
+            craft += str(data[i]) + ":" + str(data[i+1]) + ","
+            # prob += str(data[i+1]) + ","
+        f.write(craft[:-1]  + " \n")
 
     for data in low_data:
         # if data[1] not in new_craft:
