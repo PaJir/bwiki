@@ -48,7 +48,8 @@ kv = {
     "美咲(万圣节)": "美咲（万圣节）",
     "镜华(万圣节)": "镜华（万圣节）",
     "未奏希(万圣节)": "未奏希（万圣节）",
-    "美美(万圣节)": "美美（万圣节）"
+    "美美(万圣节)": "美美（万圣节）",
+    "克萝依": "克罗依"
 }
 
 with open("./rank_input.txt", encoding="utf-8") as rf:
@@ -62,11 +63,11 @@ with open("./rank_input.txt", encoding="utf-8") as rf:
             if line == "":
                 continue
             line = line.split("\t")
-            # print(line)
+            print(line)
             wf.write("{{RANK推荐/行|")
             name = line[0].split("<br/>")[0]
             wf.write(kv.get(name, name))
-            str2 = "|"+line[2]+"|"+line[3]+"|"+line[4]+"|"+line[5]+"|"+line[6]+"|"+line[7]+"|"+line[8]+"|"+line[9]+"|"+line[10]+"|"+line[11]+"|"+line[19]+"|"+line[20]+"}}\n"
+            str2 = "|"+line[2]+"|"+line[3]+"|"+line[4]+"|"+line[5]+"|"+line[6]+"|"+line[7]+"|"+line[8]+"|"+line[9]+"|"+line[10]+"|"+line[11]+"|"+line[18]+"|"+line[19]+"}}\n"
             # str2.replace("~~~", "<nowiki>~~~</nowiki>")
             wf.write(str2)
             # break

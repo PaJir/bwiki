@@ -1,10 +1,12 @@
 # 角色数据
+# output log:
+# 97 166
+# 102 169
 import sqlite3
 import io
 import re
+from config import db_name, db_name_jp
 
-db_name = "./redive_cn0925.db"
-db_name_jp = "./redive_jp0925.db"
 write_file = "role.txt"
 
 conn = sqlite3.connect(db_name)
@@ -47,6 +49,9 @@ def rank(id):
             " where unit_id = " + id + "01 and promotion_level = " + str(i)
         cursor_jp.execute(sql)
         r_i = cursor_jp.fetchone()
+        if r_i is None:
+            r.append("")
+            continue
         r_i = [str(s) for s in r_i]
         r.append("、".join(r_i))
     return "@".join(r) + "@"
@@ -75,6 +80,86 @@ def rarity(id):
             r.append("、".join(r_i[15:30]))
     return "@".join(r) + "@"
 
+# CN/JP
+def love(id):
+    pass
+
+# CN/JP
+def unit_skill_data(id):
+    sql = "select skill_id, name, action_1, action_2, action_3, action_4, action_5, action_6, action_7, description, icon_type " + \
+        "from skill_data where substr(skill_id, 1, 4) = '" + id + "' order by skill_id"
+    cursor.execute(sql)
+    cursor_jp.execute(sql)
+    (skill_data, skill_data_jp) = (cursor.fetchall(), cursor_jp.fetchall())
+    skill_id = ["001", "011", "002", "003", "101", "102", "103", "501", "511", "012"]
+    skill_map = {}
+    for data in skill_data_jp:
+        skill_map[str(data[0])[4:]] = data
+    for data in skill_data:
+        skill_map[str(data[0])[4:]] = data
+    # UB动画2
+    ret = "@"
+    # UB UB图 UB描述 UB效果 6星UB 6星UB描述 6星UB效果 
+    # 技能1 技能1图 技能1描述 技能1效果 技能2 技能2图 技能2效果 技能2描述 
+    # 特殊技能1 特殊技能1图 特殊技能1描述 特殊技能1效果 特殊技能2 特殊技能2图 特殊技能2描述 特殊技能2效果 特殊技能3 特殊技能3图 特殊技能3描述 特殊技能3效果 
+    # EX技能 EX技能图 EX技能描述 EX技能效果 EX技能plus EX技能plus描述 EX技能plus效果 
+    for index in range(8):
+        skill = skill_map.get(skill_id[index], None)
+        if skill is None:
+            ret += "@@@@"
+        else:
+            ret += skill[1] + "@Icon_skill_" + str(skill[10]) + "@" + skill[9] + "@@"
+    # EX技能plus EX技能plus描述 EX技能plus效果 
+    skill = skill_map.get(skill_id[8], None)
+    if skill is None:
+        ret += "@@@"
+    else:
+        ret += skill[1] + "@" + skill[9] + "@@"
+    # 专属技能描述 专属技能效果 
+    ret += "@@"
+    return ret
+
+# CN/JP
+def attack_pattern(id, cur):
+    idx = ["①", "②", "③", "④"]
+    sql = "select * from unit_attack_pattern where unit_id=" + id + "01 order by pattern_id"
+    cur.execute(sql)
+    pattern = cur.fetchall()
+    # print(pattern)
+    add_idx = len(pattern) > 1
+    ret = ""
+    for index in range(len(pattern)):
+        if add_idx:
+            ret += idx[index]
+        if 4 == 3 + pattern[index][2]:
+            ret += "无<br/>"
+            continue
+        for p in pattern[index][4: 3 + pattern[index][2]]:
+            if p < 1000:
+                ret += "{{行动|普攻}}"
+            elif p < 2000:
+                ret += "{{行动|" + str(p-1000) + "}}"
+            else:
+                ret += "{{行动|特殊" + str(p-2000) + "}}"
+            ret += " → "
+        ret = ret[:-3] + "<br/>"
+    ret = ret[:-5] + "@"
+    for index in range(len(pattern)):
+        if add_idx:
+            ret += idx[index]
+        for p in pattern[index][3 + pattern[index][2]: 4 + pattern[index][3]]:
+            if p < 1000:
+                ret += "{{行动|普攻}}"
+            elif p < 2000:
+                ret += "{{行动|" + str(p-1000) + "}}"
+            else:
+                ret += "{{行动|特殊" + str(p-2000) + "}}"
+            ret += " → "
+        ret = ret[:-3] + " ↻<br/>"
+    ret = ret[:-5] + "@"
+    # print(ret)
+    return ret
+
 def role_main(data, cur):
     # 节日
     fes = re.findall(p1, data[3])
@@ -97,7 +182,7 @@ def role_main(data, cur):
     # 生日
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
     # 页面名 角色ID 角色名 翻译名 角色介绍 是否实装（手动） 是否6星（手动）
-    f.write(data[3]+"@"+id+"@"+(role_name if fes=="" else "")+"@"+data[3]+"@"+data[0]+"@@@") 
+    f.write(data[3]+"@"+id+"@"+(role_name if fes=="" else "")+"@"+data[3]+"@"+data[0].replace("\\n","<br/>")+"@@@") 
         # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动） 6星碎片获取（手动）
     f.write(data[4]+"@@"+(data[5] if fes=="" else "")+"@"+str(data[6])+"@"+str(data[7])+"@"+fes+"@"+pos_type+"@"+data[8]+"@@@")
     # 1星立绘语音 3星立绘语音 生日语音 cutin语音 UB语音
@@ -111,18 +196,14 @@ def role_main(data, cur):
     f.write(str(data[17])+"@"+atk_type+"@"+str(data[19])+"@"+(data[20] if fes=="" else "")+"@")
     # 绊2-12（手动）
     f.write("@@@@@@@@@@@")
-    # UB UB图 UB描述 UB效果 UB动画2 6星UB 6星UB描述 6星UB效果 （全手动）
-    f.write("@@@@@@@@")
+    # UB动画2 UB UB图 UB描述 UB效果 6星UB 6星UB描述 6星UB效果 （全手动）
     # 技能1 技能1图 技能1描述 技能1效果 技能2 技能2图 技能2效果 技能2描述 
-    f.write("@@@@@@@@")
     # 特殊技能1 特殊技能1图 特殊技能1描述 特殊技能1效果 特殊技能2 特殊技能2图 特殊技能2描述 特殊技能2效果 特殊技能3 特殊技能3图 特殊技能3描述 特殊技能3效果 
-    f.write("@@@@@@@@@@@@")
     # EX技能 EX技能图 EX技能描述 EX技能效果 EX技能plus EX技能plus描述 EX技能plus效果 
-    f.write("@@@@@@@")
     # 专属技能描述 专属技能效果 
-    f.write("@@")
+    f.write(unit_skill_data(id))
     # 起手顺序 行动顺序 
-    f.write("@@")
+    f.write(attack_pattern(id, cur))
     # R1-R22
     f.write(rank(id))
     # R1-R22属性
@@ -167,6 +248,7 @@ def role():
                 break
         if in_cn:
             continue
+        print(data_jp[1])
         role_main(data_jp, cursor_jp)
 
 """备忘
@@ -178,12 +260,13 @@ unit_attack_pattern: 技能循环
 1 unit_promotion: RANK装备
 unit_promotion_status: 角色各RANK对应的属性【不要，日服他娘的改了装备属性】
 1 unit_rarity: 角色各星级对应的属性及其成长速度
-unit_skill_data: 角色技能数据【暂时不管】
+1 unit_skill_data: 角色技能数据【暂时不管】
 unit_unique_equip: 角色专属武器ID映射【不要】
 忘了 unlock_rarity_6: 6星开花额外的属性，需要把三项加起来
 """
 
 role()
+# attack_pattern("1061", cursor)
 # print(audio(1115, cursor))
 f.close()
 conn.close()

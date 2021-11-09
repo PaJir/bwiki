@@ -64,8 +64,8 @@ laters = ['',
     ]
 
 def read_xlsx_output_txt():
-    wb = openpyxl.load_workbook("./history2.xlsx")
-    sheetname = wb.sheetnames[1]
+    wb = openpyxl.load_workbook("./history.xlsx")
+    sheetname = wb.sheetnames[0]
     sheet = wb[sheetname]
     rows = sheet.max_row
     cols = sheet.max_column
