@@ -18,6 +18,23 @@ f = open(write_file, "w", encoding="UTF-8")
 
 bad_unit = [110201, 106701]
 p1 = re.compile(r'[（](.*?)[）]', re.S) # 匹配括号内的内容
+status_map = {
+    1: "生命值", 
+    2: "物理攻击力", 
+    4: "魔法攻击力", 
+    3: "物理防御力", 
+    5: "魔法防御力", 
+    6: "物理暴击", 
+    7: "魔法暴击", 
+    10: "生命自动回复", 
+    11: "技能值自动回复", 
+    8: "回避", 
+    9: "生命值吸收", 
+    15: "回复量上升", 
+    14: "技能值上升", 
+    140: "技能值消耗降低", 
+    17: "命中"
+}
 # CN/JP
 def audio(id, cur):
     id = str(id)
@@ -80,10 +97,47 @@ def rarity(id):
             r.append("、".join(r_i[15:30]))
     return "@".join(r) + "@"
 
-# CN/JP
-def love(id):
-    pass
-
+# CN&JP
+def chara_story_status(id):
+    ret = ""
+    sql = "select story_id, status_type_1, status_rate_1, status_type_2, status_rate_2, status_type_3, status_rate_3, status_type_4, status_rate_4, status_type_5, status_rate_5 " + \
+        "from chara_story_status " + \
+        "where chara_id_1 = " + id + \
+        " order by story_id"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    cursor_jp.execute(sql)
+    data_jp = cursor_jp.fetchall()
+    for i, d_jp in enumerate(data_jp):
+        if i == 0 and len(data_jp) == 3:
+            ret += "无变化@无变化@"
+        elif i == 2 and len(data_jp) == 3:
+            ret += "无变化@无变化@"
+        if data is not None and len(data) >= i + 1:
+            ret += status_map[data[i][1]] + "+" + str(data[i][2])
+            if data[i][3] > 0:
+                ret += "、" + status_map[data[i][3]] + "+" + str(data[i][4])
+            if data[i][5] > 0:
+                ret += "、" + status_map[data[i][5]] + "+" + str(data[i][6])
+            if data[i][7] > 0:
+                ret += "、" + status_map[data[i][7]] + "+" + str(data[i][8])
+            if data[i][9] > 0:
+                ret += "、" + status_map[data[i][9]] + "+" + str(data[i][10])
+        else:
+            ret += status_map[d_jp[1]] + "+" + str(d_jp[2])
+            if d_jp[3] > 0:
+                ret += "、" + status_map[d_jp[3]] + "+" + str(d_jp[4])
+            if d_jp[5] > 0:
+                ret += "、" + status_map[d_jp[5]] + "+" + str(d_jp[6])
+            if d_jp[7] > 0:
+                ret += "、" + status_map[d_jp[7]] + "+" + str(d_jp[8])
+            if d_jp[9] > 0:
+                ret += "、" + status_map[d_jp[9]] + "+" + str(d_jp[10])
+        
+        ret += "@"
+    if len(data_jp) < 11:
+        ret += "@@@@"
+    return ret
 # CN/JP
 def unit_skill_data(id):
     sql = "select skill_id, name, action_1, action_2, action_3, action_4, action_5, action_6, action_7, description, icon_type " + \
@@ -194,8 +248,8 @@ def role_main(data, cur):
         f.write(str(data[9])+"@"+str(data[10])+"@"+str(data[11])+"@"+birthday+"@"+data[14]+"@"+data[15]+"@"+data[16]+"@")
     # 位置 攻击方式 普攻时间 剧情短评 
     f.write(str(data[17])+"@"+atk_type+"@"+str(data[19])+"@"+(data[20] if fes=="" else "")+"@")
-    # 绊2-12（手动）
-    f.write("@@@@@@@@@@@")
+    # 绊2-12
+    f.write(chara_story_status(id))
     # UB动画2 UB UB图 UB描述 UB效果 6星UB 6星UB描述 6星UB效果 （全手动）
     # 技能1 技能1图 技能1描述 技能1效果 技能2 技能2图 技能2效果 技能2描述 
     # 特殊技能1 特殊技能1图 特殊技能1描述 特殊技能1效果 特殊技能2 特殊技能2图 特殊技能2描述 特殊技能2效果 特殊技能3 特殊技能3图 特殊技能3描述 特殊技能3效果 

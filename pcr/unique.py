@@ -3,8 +3,7 @@
 import sqlite3
 import io
 
-db_name = "./redive_cn0925.db"
-db_name_jp = "./redive_jp0925.db"
+from config import db_name, db_name_jp
 
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()

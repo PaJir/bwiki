@@ -1,12 +1,11 @@
 # 地图掉落数据
 import sqlite3
 
-areaid      = "130"                    # 110 for Normal, 120 for Hard
+areaid      = "110"                    # 110 for Normal, 120 for Hard
 # mapid       = ["21"]                     # 地图编号，是字符串，要改
 # questid_max = 17                       # 关卡的最大编号，是数字，默认14
-db_name     = "./redive_cn0925.db"     # db放在同一目录下，如果db名不同，可以换
-
-conn = sqlite3.connect(db_name)
+from config import db_name, db_name_jp  # db放在同一目录下，如果db名不同，可以换
+conn = sqlite3.connect(db_name_jp)
 cursor = conn.cursor()
 
 
@@ -106,7 +105,7 @@ where r.drop_reward_id in (""" + \
     # print("}}")
     print(print_str)
 
-mapid = [str(a) for a in range(1, 33)]
+mapid = [str(a) for a in range(50, 60)]
 questid_max = [a for a in range(1, 20)]
 for m in mapid:
     for i in questid_max:
