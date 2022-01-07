@@ -23,6 +23,8 @@
 
 [帮助:变量](https://wiki.biligame.com/wiki/%E5%B8%AE%E5%8A%A9:%E5%8F%98%E9%87%8F) 
 
+[Help:Magic words](https://www.mediawiki.org/wiki/Help:Magic_words)
+
 | 语法                 | 含义                                                         |
 | -------------------- | ------------------------------------------------------------ |
 | `{{模板名|参数}}`    | 加载在**模板**(template)名字空间内的内容，可以传入参数       |
@@ -276,15 +278,21 @@ class: `col-sm-3`, `col-sm-12`, `xs, sm, md, lg, xl`
 
 ## Form
 
-表单，可以在`Form`名字空间下创建一个表单，相当于在`Template`（模板）名字空间下创建一个模板。
+[表单](https://www.mediawiki.org/wiki/Extension:Page_Forms)，可以在`Form`名字空间下创建一个表单，相当于在`Template`（模板）名字空间下创建一个模板。
 
-创建表单，在`特殊:创建表单`里，根据名字添加元素，元素可以是模板或者章节，也就是所一个表单可以使用多个模板，并且可以自由定义模板字段的默认值、值类型、填写位置等等。创建的表单类似于[pcr/Form:添加角色2](https://wiki.biligame.com/pcr/Form:%E6%B7%BB%E5%8A%A0%E8%A7%92%E8%89%B22)。
+创建表单，在`特殊:创建表单`里，根据名字添加元素，元素可以是模板或者章节，也就是说一个表单可以使用多个模板，并且可以自由定义模板字段的默认值、值类型、填写位置等等。创建的表单类似于[pcr/Form:添加角色2](https://wiki.biligame.com/pcr/Form:%E6%B7%BB%E5%8A%A0%E8%A7%92%E8%89%B22)。
 
 有了表单之后，可以在表单里填写页面名，点击<button>创建或编辑</button>将会跳转到一个新的链接。例如[pcr/特殊:编辑表格/添加角色2/凯露（新年）](https://wiki.biligame.com/pcr/%E7%89%B9%E6%AE%8A:%E7%BC%96%E8%BE%91%E8%A1%A8%E6%A0%BC/%E6%B7%BB%E5%8A%A0%E8%A7%92%E8%89%B22/%E5%87%AF%E9%9C%B2%EF%BC%88%E6%96%B0%E5%B9%B4%EF%BC%89)，跳转后的链接包含使用的表单和目的页面，在这个链接显示的页面里，可以使用表单来编辑页面。
 
 优点：可视化编辑，总比纯文字要强。
 
 缺点：依赖于模板和表单，像写攻略文章这样的活是不能用表单的。
+
+### Input types
+
+在`Form`里，通过`Form tags`来给模板字段输入值，后面可以添加许多自定义的输入类型 ([Input types](https://www.mediawiki.org/wiki/Extension:Page_Forms/Input_types))，例如`{{{field|字段|size=18}}}`设置该`field`输入框的宽度为18。以下 MediaWiki & Cargo quick reference 第二页一整页都是教程。
+
+![img](https://upload.wikimedia.org/wikipedia/mediawiki/4/4e/Cargo_quick_reference.png)
 
 ## 页面快捷键
 

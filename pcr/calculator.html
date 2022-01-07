@@ -1,0 +1,431 @@
+<div class="parameters">
+    <div class="level-info">
+        <div class="input-row">
+            <label>角色星级(暂不含6星装备物属性)</label>
+            <select id="star-select" class="PN-select" onChange="changeStar(this.value)">
+                <option value="6">6</option>
+                <option value="5" selected="selected">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+            </select>
+            <label>、角色等级</label>
+            <input type="number" step="1" name="level" value="151" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)" />
+        </div>
+        <div class="input-row">
+            <label>专武等级(开发中)</label>
+            <!--<input type="number" step="1" name="level" value="150" id="level-select" class="PN-number" onChange="changeLevel()" />-->
+        </div>
+        <div class="input-row">
+            <label>角色rank</label>
+            <select id="rank-select" class="PN-select" onChange="changeRank(this.value)">
+                <option value="19">19</option>
+                <option value="18">18</option>
+                <option value="17">17</option>
+                <option value="16">16</option>
+                <option value="15" selected="selected">15</option>
+                <option value="14">14</option>
+                <option value="13">13</option>
+                <option value="12">12</option>
+                <option value="11">11</option>
+                <option value="10">10</option>
+                <option value="9">9</option>
+                <option value="8">8</option>
+                <option value="7">7</option>
+                <option value="6">6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+            </select>
+        </div>
+        <div class="input-row">
+            <label>（-1表示不装备，0~5表示强化等级）</label>
+        </div>
+        <div class="input-row">
+            <label>左上</label>
+            <input type="number" step="1" value="-1" min="-1" max="5" id="equip1" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+            <label> 左中</label>
+            <input type="number" step="1" value="5" min="-1" max="5" id="equip3" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+            <label> 左下</label>
+            <input type="number" step="1" value="5" min="-1" max="5" id="equip5" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+            <label> 右上</label>
+            <input type="number" step="1" value="5" min="-1" max="5" id="equip2" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+            <label> 右中</label>
+            <input type="number" step="1" value="5" min="-1" max="5" id="equip4" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+            <label> 右下</label>
+            <input type="number" step="1" value="5" min="-1" max="5" id="equip6" class="PN-number" onChange="changeEquip(this.id, this.value)" />
+        </div>
+        <div class="input-row">
+            <label>剧情好感度</label>
+            <input type="number" step="1" value="8" min="1" max="12" id="love-select" class="PN-number" onChange="changeLove()" />
+            需要动态生成
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var status_type = [
+        "hp",
+        "atk",
+        "magic_str",
+        "def",
+        "magic_def",
+        "physical_critical",
+        "magic_critical",
+        "wave_hp_recovery",
+        "wave_energy_recovery",
+        "dodge",
+        "life_steal",
+        "hp_recovery_rate",
+        "energy_recovery_rate",
+        "energy_reduce_rate",
+        "accuracy"
+    ];
+    var status_type_cn = {
+        生命值: 0,
+        物理攻击力: 1,
+        魔法攻击力: 2,
+        物理防御力: 3,
+        魔法防御力: 4,
+        物理暴击: 5,
+        魔法暴击: 6,
+        生命值自动回复: 7,
+        技能值自动回复: 8,
+        回避: 9,
+        生命值吸收: 10,
+        回复量上升: 11,
+        技能值上升: 12,
+        技能值消耗降低: 13,
+        命中: 14
+    };
+    // TODO: 与[[全局]]对接
+    var calculate_factor = {
+        unit_id: "",
+        unit_name: "",
+        level: 151,
+        rank: 15,
+        star: 5,
+        love: {},
+        equip1: -1,
+        equip2: 5,
+        equip3: 5,
+        equip4: 5,
+        equip5: 5,
+        equip6: 5
+    };
+    var love = {}; // <unit_name, [绊2,绊3...,绊12]>
+    var rank_equip = []; // R1, R2, R3, ... A element: 6 equipments (Number[])
+    var rarity = []; // 1x, 1xup, 2x, 2xup, ... A element: 15 elements (Number[])
+    var equip_map = {}; // <equip_id, data&up> (<Number, Number[]>)
+    var rank_max = 19; // limit to R1, R2, ..., R{rank_max}
+    var html_love = "";
+    function loadData() {
+        $.getJSON(mw.util.wikiScript("api"), {
+            format: "json",
+            action: "parse",
+            text:
+                "{" +
+                "{#ask:[[分类:角色]][[是否实装::是]][[kana::" +
+                calculate_factor.unit_name +
+                "||" +
+                calculate_factor.unit_name.replace(/[\(（].*/g, "") +
+                "]]|?翻译名" +
+                "|?绊2|?绊3|?绊4|?绊5|?绊6|?绊7|?绊8|?绊9|?绊10|?绊11|?绊12" +
+                "|headers=hide|mainlabel=-|limit=10}}",
+            contentmodel: "wikitext"
+        }).done(function (data) {
+            text = data.parse.text["*"];
+            text.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi).forEach((love_unit_smw) => {
+                // 一个角色的剧情羁绊：unit_name, 绊2, 绊3...
+                let love_unit = love_unit_smw.match(/("smwtype_txt">)[^<]+</g).map((value) => {
+                    return value.substring(14, value.length - 1);
+                });
+                html_love +=
+                    "<label>" +
+                    love_unit[0] +
+                    "</label>" +
+                    '<input type="number" step="1" value="' +
+                    love_unit.length +
+                    '" min="1" max="' +
+                    love_unit.length +
+                    '" id="' +
+                    love_unit[0] +
+                    '" class="PN-number" onChange="changeLove(this.id, this.value)" />';
+                calculate_factor.love[love_unit[0]] = love_unit.length;
+                love[love_unit[0]] = [];
+                for (let i = 1; i < love_unit.length; i++) {
+                    // 一个剧情羁绊加成，如“技能值自动回复+150、魔法防御力+4”
+                    love[love_unit[0]].push(Array.from({ length: 15 }, () => 0));
+                    if (love_unit[i] === "无变化") {
+                        continue;
+                    }
+                    let loves = love_unit[i].split("、");
+                    loves.forEach((love_add) => {
+                        let value = love_add.split("+");
+                        love[love_unit[0]][i - 1][status_type_cn[value[0]]] = parseInt(value[1]);
+                    });
+                }
+            });
+        });
+        $.getJSON(mw.util.wikiScript("api"), {
+            format: "json",
+            action: "parse",
+            text:
+                "{" +
+                "{#ask:[[分类:角色]][[角色ID::" +
+                calculate_factor.unit_id +
+                "]]" +
+                Array.from(Array(rank_max), (v, k) => "|?R" + (k + 1).toString()).join("") +
+                "|?1x属性|?1x属性强化|?2x属性|?2x属性强化|?3x属性|?3x属性强化|?4x属性|?4x属性强化|?5x属性|?5x属性强化|?6x属性|?6x属性强化" +
+                "|format=list|headers=hide|mainlabel=-|limit=1}}",
+            contentmodel: "wikitext"
+        }).done(function (data) {
+            text = data.parse.text["*"];
+            // all_data[0: rank_max]是Rank装备
+            // all_data[rank_max: rank_max+12]是1x-6x基础&强化属性
+            var all_data = text.match(/("smw-value">)(\d|\.|、)+/g).map((value) => {
+                return value.substring(12);
+            });
+            // 为0时全加载完毕
+            var running = 0;
+            for (var i = 0; i < rank_max; i++) {
+                rank_equip.push(all_data[i].split("、").map(Number));
+            }
+            for (var i = rank_max; i < all_data.length; i++) {
+                rarity.push(all_data[i].split("、").map(Number));
+            }
+            for (var j = 0; j < 6; j++) {
+                for (var i = 0; i < rank_equip.length; i++) {
+                    // 避免重复加载
+                    if (equip_map[rank_equip[i][j]] !== undefined) {
+                        continue;
+                    }
+                    equip_map[rank_equip[i][j]] = [];
+                    running++;
+                    $.getJSON(mw.util.wikiScript("api"), {
+                        format: "json",
+                        action: "parse",
+                        text:
+                            "{" +
+                            "{#ask:[[分类:装备]][[装备编号::" +
+                            rank_equip[i][j] +
+                            "]]|?装备编号|?HP|?物理攻击|?魔法攻击|?物理防御|?魔法防御|?物理暴击|?魔法暴击|?HP自动回复|?TP自动回复|?回避|?生命吸收|?HP上升|?TP上升|?TP消耗减少|?命中" +
+                            "|?HP强化|?物理攻击强化|?魔法攻击强化|?物理防御强化|?魔法防御强化|?物理暴击强化|?魔法暴击强化|?HP自动回复强化|?TP自动回复强化|?回避强化|?生命吸收强化|?HP上升强化|?TP上升强化|?TP消耗减少强化|?命中强化" +
+                            "|format=list|headers=hide|mainlabel=-|limit=1}}",
+                        contentmodel: "wikitext"
+                    }).done(function (data) {
+                        text = data.parse.text["*"];
+                        if (text === undefined) {
+                            return;
+                        }
+                        var equip_data = text
+                            .match(/("smw-value">)(\d|\.|、)+/g)
+                            .map((value) => {
+                                return value.substring(12);
+                            })
+                            .map(Number);
+                        equip_map[equip_data[0]] = equip_data.slice(1);
+                        running--;
+                        if (running === 0) {
+                            console.log(calculate_factor, love);
+                            showCalculator();
+                            calculateResult();
+                        }
+                    });
+                }
+            }
+        });
+    }
+    function calculateResult() {
+        // deep copy 基础属性
+        var result = rarity[(calculate_factor.star - 1) * 2].map((value) => {
+            return value;
+        });
+        // love status ~
+        for (let key_name in calculate_factor.love) {
+            let value_number = calculate_factor.love[key_name];
+            if (value_number === 1) {
+                return;
+            }
+            for (let i = 0; i < value_number - 1; i++) {
+                result = result.map((v, idx) => {
+                    return v + love[key_name][i][idx];
+                });
+            }
+        }
+        // + 星级强化属性
+        rarity[(calculate_factor.star - 1) * 2 + 1].map((value, index) => {
+            result[index] += value * (calculate_factor.level + calculate_factor.rank);
+        });
+        // 装备属性，麻烦事
+        let rankMinOne = calculate_factor.rank - 1;
+        if (rankMinOne > 0) {
+            for (var i = 0; i < rankMinOne; i++) {
+                for (var j = 0; j < 6; j++) {
+                    result = result.map((value, index) => {
+                        return value + equip_map[rank_equip[i][j]][index];
+                    });
+                }
+            }
+        }
+        calculate_factor.equip1 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][0]][index] + equip_map[rank_equip[rankMinOne][0]][index + 15] * calculate_factor.equip1);
+            }));
+        calculate_factor.equip2 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][1]][index] + equip_map[rank_equip[rankMinOne][1]][index + 15] * calculate_factor.equip2);
+            }));
+        calculate_factor.equip3 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][2]][index] + equip_map[rank_equip[rankMinOne][2]][index + 15] * calculate_factor.equip3);
+            }));
+        calculate_factor.equip4 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][3]][index] + equip_map[rank_equip[rankMinOne][3]][index + 15] * calculate_factor.equip4);
+            }));
+        calculate_factor.equip5 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][4]][index] + equip_map[rank_equip[rankMinOne][4]][index + 15] * calculate_factor.equip5);
+            }));
+        calculate_factor.equip6 >= 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(equip_map[rank_equip[rankMinOne][5]][index] + equip_map[rank_equip[rankMinOne][5]][index + 15] * calculate_factor.equip6);
+            }));
+        // 四舍五入
+        result = result.map((value) => {
+            return Math.round(value);
+        });
+        // 显示到HTML
+        for (let i = 0; i < status_type.length; i++) {
+            document.getElementById("PN" + status_type[i]).innerHTML = result[i];
+        }
+    }
+    function changeStar(value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.star = parseInt(value);
+        calculateResult();
+    }
+    function changeRank(value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.rank = parseInt(value);
+        calculateResult();
+    }
+    function changeLevel(value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.level = parseInt(value);
+        calculateResult();
+    }
+    function changeEquip(name, value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor[name] = value;
+        calculateResult();
+    }
+    function changeLove(name, value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.love[name] = value;
+        calculateResult();
+    }
+    // ----HTML----
+    function showCalculator() {
+        var html_text =
+            '<div class="parameters"><div class="level-info"><div class="input-row"><label>角色星级(暂不含6星装备物属性)</label>' +
+            '<select id="star-select" class="PN-select" onChange="changeStar(this.value)">';
+        for (let i = rarity.length / 2; i >= 1; i--) {
+            if (i === 5) {
+                html_text += '<option value="5" selected="selected">5</option>';
+            } else {
+                html_text += '<option value="' + i + '">' + i + "</option>";
+            }
+        }
+        html_text +=
+            '</select><label>、角色等级</label><input type="number" step="1" name="level" value="151" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)"/></div>' +
+            '<div class="input-row"><label>专武等级(开发中)</label></div>' +
+            '<div class="input-row"><label>角色rank</label><select id="rank-select" class="PN-select" onChange="changeRank(this.value)">';
+        for (let i = rank_max; i >= 1; i--) {
+            if (i === calculate_factor.rank) {
+                html_text += '<option value="' + i + '" selected="selected">' + i + "</option>";
+            } else {
+                html_text += '<option value="' + i + '">' + i + "</option>";
+            }
+        }
+        html_text +=
+            '</select></div><div class="input-row"><label>（-1表示不装备，0~5表示强化等级）</label></div><div class="input-row">' +
+            '<label>左上</label><input type="number" step="1" value="' + calculate_factor.equip1 + '" min="-1" max="5" id="equip1" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>左中</label><input type="number" step="1" value="' + calculate_factor.equip3 + '" min="-1" max="5" id="equip3" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>左下</label><input type="number" step="1" value="' + calculate_factor.equip5 + '" min="-1" max="5" id="equip5" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>右上</label><input type="number" step="1" value="' + calculate_factor.equip2 + '" min="-1" max="5" id="equip2" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>右中</label><input type="number" step="1" value="' + calculate_factor.equip4 + '" min="-1" max="5" id="equip4" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>右下</label><input type="number" step="1" value="' + calculate_factor.equip6 + '" min="-1" max="5" id="equip6" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '</div><div class="input-row"><label>剧情好感度：</label>';
+
+        var html_end = "</div></div></div>";
+        $("#rarity-calculator").html(html_text + html_love + html_end);
+    }
+
+    var $ready = function () {
+        calculate_factor.unit_id = $("#PNID")[0].innerHTML.replace('\n', '');
+        calculate_factor.unit_name = $("#PNNAME")[0].innerHTML.replace('\n', '');
+        // calculate_factor.level = parseInt($("#level-select")[0].value);
+        // calculate_factor.star = parseInt($("#star-select")[0].value);
+        // calculate_factor.rank = parseInt($("#rank-select")[0].value);
+        loadData();
+
+        // ------
+        // 角色页面动态立绘点击显示
+        var videoHeight = window.getComputedStyle(document.getElementById("charaStaticFile"), null).height;
+        if (videoHeight === "auto") {
+            videoHeight = window.innerWidth < 768 ? 200 : 370;
+        }
+        $("#loadCharaAnimation").click(function () {
+            var heroname = mw.config.get("wgPageName");
+            $.getJSON(mw.util.wikiScript("api"), {
+                format: "json",
+                action: "parse",
+                text: "{" + "{B站视频2|{{#show:" + heroname + "|?动态立绘}}|p={{#show:" + heroname + "|?动态立绘分p}}|height=" + videoHeight + "|autoplay=1}}",
+                contentmodel: "wikitext"
+            }).done(function (d) {
+                var text_ = d.parse.text["*"].match(/(?<=><p>).*/g);
+                if (text_ === null) {
+                    return;
+                }
+                document.getElementById("showCharaAnimation").innerHTML = text_[0];
+            });
+        });
+        $("#loadCharaAnimation6").click(function () {
+            var heroname = mw.config.get("wgPageName");
+            $.getJSON(mw.util.wikiScript("api"), {
+                format: "json",
+                action: "parse",
+                text: "{" + "{B站视频2|{{#show:" + heroname + "|?6星动态立绘}}|p={{#show:" + heroname + "|?6星动态立绘分p}}|height=" + videoHeight + "}}",
+                contentmodel: "wikitext"
+            }).done(function (d) {
+                var text_ = d.parse.text["*"].match(/(?<=><p>).*/g);
+                if (text_ === null) {
+                    return;
+                }
+                document.getElementById("showCharaAnimation6").innerHTML = text_[0];
+            });
+        });
+
+        console.log("%c 属性计算器&动态立绘 %cv0.3.0", "color: #fff; padding: 5px 0; background: #a6ae4d;", "padding: 5px 6px 5px 5px; background: #f6eebd;");
+    };
+    (function () {
+        var t = function () {
+            window.jQuery && window.mw && mw.util ? $ready() : window.setTimeout(t, 100);
+        };
+        t();
+    })();
+</script>

@@ -16,7 +16,7 @@ cursor_jp = conn_jp.cursor()
 
 f = open(write_file, "w", encoding="UTF-8")
 
-bad_unit = [110201, 106701]
+bad_unit = [110201] #, 106701]
 p1 = re.compile(r'[（](.*?)[）]', re.S) # 匹配括号内的内容
 status_map = {
     1: "生命值", 
@@ -45,7 +45,7 @@ def audio(id, cur):
         d = cur.fetchone()
         if d is None:
             break
-        desp.append(d[0].replace("\\n","<br/>"))
+        desp.append(d[0].replace("\\\\n","<br/>").replace("\\n", "<br/>"))
     x1 = "￥".join(desp[0:5])
     x3 = "￥".join(desp[5:10])
     birth = "￥".join(desp[10:12])
@@ -236,7 +236,7 @@ def role_main(data, cur):
     # 生日
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
     # 页面名 角色ID 角色名 翻译名 角色介绍 是否实装（手动） 是否6星（手动）
-    f.write(data[3]+"@"+id+"@"+(role_name if fes=="" else "")+"@"+data[3]+"@"+data[0].replace("\\n","<br/>")+"@@@") 
+    f.write(data[3]+"@"+id+"@"+(role_name if fes=="" else "")+"@"+data[3]+"@"+data[0].replace("\\\\n","<br/>")+"@@@") 
         # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动） 6星碎片获取（手动）
     f.write(data[4]+"@@"+(data[5] if fes=="" else "")+"@"+str(data[6])+"@"+str(data[7])+"@"+fes+"@"+pos_type+"@"+data[8]+"@@@")
     # 1星立绘语音 3星立绘语音 生日语音 cutin语音 UB语音
@@ -300,8 +300,8 @@ def role():
             if data[1] == data_jp[1]:
                 in_cn = True
                 break
-        if in_cn:
-            continue
+        # if in_cn:
+        #     continue
         print(data_jp[1])
         role_main(data_jp, cursor_jp)
 
