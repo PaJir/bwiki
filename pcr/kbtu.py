@@ -8,12 +8,14 @@ import multiprocessing as mp
 # 浅色人物 1
 # 深色背景 2
 # 深色人物 3
-lightFile = "D:\Extra\pcr\GIF\露娜\\0 1.png"
+inputPath = "D:\Extra\pcr\GIF\香澄（魔法少女）"
+outputPath = inputPath + "2"
+# inputPath = "D:\Extra\pcr\Q\\bandicam"
+# outputPath = "D:\Extra\pcr\Q\\nobg"
 # lightFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 0.png"
-inputPath = "D:\Extra\pcr\GIF\嘉夜"
-darkFile = "D:\Extra\pcr\GIF\露娜\\0 0.png"
+# lightFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 0.png"
 # darkFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 1.png"
-outputPath = "D:\Extra\pcr\GIF\嘉夜2"
+# darkFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 1.png"
 lightStart = "2"
 darkStart = "1"
 
@@ -26,22 +28,24 @@ def getPixelColor(fileName):
     return np.array(img)
 
 
-light = getPixelColor(lightFile)
-dark = getPixelColor(darkFile)
+# light = getPixelColor(lightFile)
+# dark = getPixelColor(darkFile)
+light = [255, 255, 255, 255]
+dark = [0, 0, 0, 255]
 
-height = len(light)
-width = len(light[0])
-
-assert len(dark) == height and len(dark[0]) == width
+# assert len(dark) == len(light) and len(dark[0]) == len(light[0])
 
 
 def handle(l, d, n):
+    height = len(l)
+    width = len(l[0])
+    # assert height <= len(dark) and width <= len(dark[0])
     outData = np.zeros([height, width, 4])
     for i in range(0, height):
         for j in range(0, width):
-            a = [float(x) for x in light[i][j]]
+            a = [float(x) for x in light]
             A = [float(x) for x in l[i][j]]
-            b = [float(x) for x in dark[i][j]]
+            b = [float(x) for x in dark]
             B = [float(x) for x in d[i][j]]
             # if all(a == A) and all(b == B):
             if a == A and b == B:
@@ -52,7 +56,7 @@ def handle(l, d, n):
                 # 如果浅色人物和深色人物的颜色相同，则为全色
                 # if all(A == B):
                 if A == B:
-                    outData[i][j] = A
+                    outData[i][j] = [A[0], A[1], A[2], 255]
                 else:
                     # alpha = 1 - ((a1R - b1R) / (aR - bR))
                     Ra = min(1., 1 - ((A[0] - B[0]) / (a[0] - b[0])))
@@ -93,8 +97,9 @@ if __name__ == "__main__":
         newFileName = os.path.join(outputPath, file)
         l = getPixelColor(inputLightFileName)
         d = getPixelColor(inputDarkFileName)
-        assert len(l) == height and len(d) == height
-        assert len(l[0]) == width and len(d[0]) == width
+        assert len(l) == len(d) and len(l[0]) == len(d[0])
+        # handle(l, d, newFileName)
+        # break
         pool.apply_async(handle, (l, d, newFileName))
     pool.close()
     pool.join()
