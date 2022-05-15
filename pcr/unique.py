@@ -3,7 +3,7 @@
 import sqlite3
 import io
 
-from config import db_name, db_name_jp
+from config import db_name, db_name_jp, split_at
 
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
@@ -11,9 +11,9 @@ conn_jp = sqlite3.connect(db_name_jp)
 cursor_jp = conn_jp.cursor()
 
 def write_same(data):
-    s = str(data[0]) + "@"
+    s = str(data[0]) + split_at
     for i in range(0, 33):
-        s += str(data[i]).replace("\\n","<br/>") + "@"
+        s += str(data[i]).replace("\\n","<br/>") + split_at
     return s + "\n"
 
 def equipment_craft():

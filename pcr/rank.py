@@ -55,9 +55,17 @@ kv = {
     "凯露(新年)": "凯露（新年）",
     "栞(魔法少女)": "栞（魔法少女）",
     "铃莓(新年)": "铃莓（新年）",
-    "霞(魔法少女)": "香澄（魔法少女）"
+    "霞(魔法少女)": "香澄（魔法少女）",
+    "佩可莉姆(公主)": "佩可莉姆（公主）",
+    "未央": "未央（偶像大师）",
+    "凜(偶像大师)": "凛（偶像大师）",
+    "卯月(偶像大师)": "卯月（偶像大师）",
+    "未央(偶像大师)": "未央（偶像大师）",
+    "克里斯缇娜（圣诞节）": "克莉丝提娜（圣诞节）",
+    "可可萝(公主)": "可可萝（公主）"
 }
 
+# 备忘：需要修改的角色：克莉丝提娜（圣诞节），惠理子（情人节），伊莉亚（圣诞节）
 with open("./rank_input.txt", encoding="utf-8") as rf:
     with open("./rank.txt", "w", encoding="utf-8") as wf:
         lines = ""
@@ -71,10 +79,11 @@ with open("./rank_input.txt", encoding="utf-8") as rf:
             line = line.split("\t")
             # print(line)
             wf.write("{{RANK推荐/行|")
-            name = line[0].split("<br/>")[0]
+            name_split = line[0].split("<br/>")
+            name = name_split[0] if len(name_split) == 1 else "".join(name_split[:-1])
             # 角色
             wf.write(kv.get(name, name))
-            # 定位D 会战 竞技进攻 竞技防守 六星特性 星级 专武等级 专武解锁 升级 培养顺序
+            # 定位 会战 竞技进攻 竞技防守 六星特性 星级 专武等级 专武解锁 升级 培养顺序
             str2 = "|"+line[2]+"|"+line[3]+"|"+line[4]+"|"+line[5]+"|"+line[6]+"|"+line[7]+"|"+line[8]+"|"+line[9]+"|"+line[10]+"|"+line[11]
             # 花舞RANK推荐U 说明/备注V
             str2 += "|"+line[20]+"|"+line[21]+"}}\n"

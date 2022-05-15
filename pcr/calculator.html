@@ -11,11 +11,11 @@
                 <option value="1">1</option>
             </select>
             <label>、角色等级</label>
-            <input type="number" step="1" name="level" value="151" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)" />
+            <input type="number" step="1" name="level" value="154" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)" />
         </div>
         <div class="input-row">
-            <label>专武等级(开发中)</label>
-            <!--<input type="number" step="1" name="level" value="150" id="level-select" class="PN-number" onChange="changeLevel()" />-->
+            <label>专武等级</label>
+            <input type="number" step="1" name="unique_level" value="160" id="unique-level-select" class="PN-number" onChange="changeUniqueLevel(this.value)" />
         </div>
         <div class="input-row">
             <label>角色rank</label>
@@ -100,24 +100,28 @@
         技能值消耗降低: 13,
         命中: 14
     };
-    // TODO: 与[[全局]]对接
+    // level, skill_level, unique_level, rank, equip1,...equip6 已与[[全局]]对接
     var calculate_factor = {
         unit_id: "",
         unit_name: "",
-        level: 154,
+        level: 1,
+        skill_level: 1,
+        unique_level: 10,
         rank: 16,
         star: 5,
         love: {},
         equip1: -1,
-        equip2: 5,
+        equip2: 5, // 右上
         equip3: -1,
         equip4: 5,
         equip5: -1,
-        equip6: 5
+        equip6: 5,
+        rank_max: 19 // limit to R1, R2, ..., R{rank_max}
     };
     var love = {}; // <unit_name, [绊2,绊3...,绊12]>
     var rank_equip = []; // R1, R2, R3, ... A element: 6 equipments (Number[])
     var rarity = []; // 1x, 1xup, 2x, 2xup, ... A element: 15 elements (Number[])
+    var unique = []; // unique equipment data, empty or 30 elements (Number[])
     // <equip_id, data&up> (<Number, Number[]>)
     var equip_map = {
         101011: [15, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -502,16 +506,17 @@
         107611: [0, 0, 195, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0],
         107612: [0, 0, 201, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40.2, 0, 1.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     };
-    var rank_max = 19; // limit to R1, R2, ..., R{rank_max}
     var html_love = "";
     function loadData() {
+        // 处理 get 异步请求，最后响应的显示并计算初始值
+        var waiting = 3;
         // 剧情羁绊相关属性
         $.getJSON(mw.util.wikiScript("api"), {
             format: "json",
             action: "parse",
             text:
                 "{" +
-                "{#ask:[[分类:角色]][[是否实装::是]][[kana::" +
+                "{#ask:[[分类:角色]][[kana::" +
                 calculate_factor.unit_name +
                 "||" +
                 calculate_factor.unit_name.split("(")[0].split("（")[0] +
@@ -534,6 +539,9 @@
                         .slice(1)
                         .map((value) => {
                             return value.split("<")[0];
+                        })
+                        .filter((value) => {
+                            return value !== "";
                         });
                     html_love +=
                         "<label>" +
@@ -561,6 +569,42 @@
                         });
                     }
                 });
+            waiting--;
+            if (waiting === 0) {
+                showCalculator();
+                calculateResult();
+            }
+        });
+        // 专武及其强化数据
+        $.getJSON(mw.util.wikiScript("api"), {
+            format: "json",
+            action: "parse",
+            text:
+                "{" +
+                "{#show:13" +
+                calculate_factor.unit_id.slice(1) +
+                "1" +
+                "|?HP|?物理攻击|?魔法攻击|?物理防御|?魔法防御|?物理暴击|?魔法暴击|?HP自动回复|?TP自动回复|?回避|?生命吸收|?HP上升|?TP上升|?TP消耗减少|?命中" +
+                "|?HP强化|?物理攻击强化|?魔法攻击强化|?物理防御强化|?魔法防御强化|?物理暴击强化|?魔法暴击强化|?HP自动回复强化|?TP自动回复强化|?回避强化|?生命吸收强化|?HP上升强化|?TP上升强化|?TP消耗减少强化|?命中强化" +
+                "|format=list|headers=hide|mainlabel=-}}",
+            contentmodel: "wikitext"
+        }).done(function (data) {
+            text = data.parse.text["*"];
+            unique = text
+                .split('"smw-value">')
+                .slice(1)
+                .map((value) => {
+                    return value.split("<")[0];
+                })
+                .map(Number);
+            if (unique.length === 0) {
+                calculate_factor.unique_level = 0;
+            }
+            waiting--;
+            if (waiting === 0) {
+                showCalculator();
+                calculateResult();
+            }
         });
         // 星级及其强化数据
         $.getJSON(mw.util.wikiScript("api"), {
@@ -571,7 +615,7 @@
                 "{#ask:[[分类:角色]][[角色ID::" +
                 calculate_factor.unit_id +
                 "]]" +
-                Array.from(Array(rank_max), (v, k) => "|?R" + (k + 1).toString()).join("") +
+                Array.from(Array(calculate_factor.rank_max), (v, k) => "|?R" + (k + 1).toString()).join("") +
                 "|?1x属性|?1x属性强化|?2x属性|?2x属性强化|?3x属性|?3x属性强化|?4x属性|?4x属性强化|?5x属性|?5x属性强化|?6x属性|?6x属性强化" +
                 "|format=list|headers=hide|mainlabel=-|limit=1}}",
             contentmodel: "wikitext"
@@ -585,16 +629,17 @@
                 .map((value) => {
                     return value.split("<")[0];
                 });
-            // 为0时全加载完毕
-            var running = 0;
-            for (var i = 0; i < rank_max; i++) {
+            for (var i = 0; i < calculate_factor.rank_max; i++) {
                 rank_equip.push(all_data[i].split("、").map(Number));
             }
-            for (var i = rank_max; i < all_data.length; i++) {
+            for (var i = calculate_factor.rank_max; i < all_data.length; i++) {
                 rarity.push(all_data[i].split("、").map(Number));
             }
-            showCalculator();
-            calculateResult();
+            waiting--;
+            if (waiting === 0) {
+                showCalculator();
+                calculateResult();
+            }
         });
     }
     function calculateResult() {
@@ -606,7 +651,7 @@
         for (let key_name in calculate_factor.love) {
             let value_number = calculate_factor.love[key_name];
             if (value_number === 1) {
-                return;
+                continue;
             }
             for (let i = 0; i < value_number - 1; i++) {
                 result = result.map((v, idx) => {
@@ -653,14 +698,82 @@
             (result = result.map((value, index) => {
                 return value + Math.ceil(equip_map[rank_equip[rankMinOne][5]][index] + equip_map[rank_equip[rankMinOne][5]][index + 15] * calculate_factor.equip6);
             }));
+        // 专武
+        calculate_factor.unique_level > 0 &&
+            (result = result.map((value, index) => {
+                return value + Math.ceil(unique[index] + unique[index + 15] * (calculate_factor.unique_level - 1));
+            }));
         // 四舍五入
         result = result.map((value) => {
-            return Math.round(value);
+            return value.toFixed(0);
         });
         // 显示到HTML
         for (let i = 0; i < status_type.length; i++) {
             document.getElementById("PN" + status_type[i]).innerHTML = result[i];
         }
+        calculateSkill(result);
+    }
+    function calculateSkill(result) {
+        // 技能等级：calculate_factor.skill_level
+        // 物理攻击力：result[1]
+        // 魔法攻击力：result[2]
+        // 其他暂时不管
+        document.getElementsByClassName("skill-detail").forEach(function (e) {
+            let skill_details = e.innerText.split("\n");
+            if (skill_details[0] === "") {
+                return;
+            }
+            let result_details = [];
+            for (let skill_detail of skill_details) {
+                let result_detail = "";
+                let expr = "";
+                let in_expr = false;
+                let in_calculated = false;
+                for (let c of skill_detail) {
+                    if (c === "[") {
+                        in_calculated = true;
+                        continue;
+                    } else if (c === "]") {
+                        in_calculated = false;
+                        continue;
+                    } else if (c === "【") {
+                        in_expr = true;
+                        continue;
+                    } else if (c === "】") {
+                        in_expr = false;
+                        let expr2 = expr;
+                        expr2 = expr2.replace("技能等级", calculate_factor.skill_level.toString());
+                        for (status_key in status_type_cn) {
+                            expr2 = expr2.replace(status_key, result[status_type_cn[status_key]]);
+                        }
+                        if (expr2 === expr) {
+                            result_detail += "【" + expr + "】";
+                        } else {
+                            let eval_expr = "";
+                            try {
+                                if (skill_detail.indexOf("防御力") === -1) {
+                                    result_detail += "[" + Math.floor(eval(expr2)).toString() + "]";
+                                } else {
+                                    result_detail += "[" + Math.ceil(eval(expr2)).toString() + "]";
+                                }
+                            } catch (error) {}
+                            result_detail += "【" + expr + "】";
+                        }
+                        expr = "";
+                        continue;
+                    }
+                    if (in_expr) {
+                        expr += c;
+                    } else if (in_calculated) {
+                        continue;
+                    } else {
+                        result_detail += c;
+                    }
+                }
+                result_details.push(result_detail);
+            }
+            e.innerText = result_details.join("\n");
+        });
     }
     function changeStar(value) {
         if (value === "") {
@@ -683,6 +796,21 @@
         calculate_factor.level = parseInt(value);
         calculateResult();
     }
+    function changeSkillLevel(value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.skill_level = parseInt(value);
+        $("#skill-range-text")[0].innerHTML = value;
+        calculateResult();
+    }
+    function changeUniqueLevel(value) {
+        if (value === "") {
+            return;
+        }
+        calculate_factor.unique_level = parseInt(value);
+        calculateResult();
+    }
     function changeEquip(name, value) {
         if (value === "") {
             return;
@@ -700,59 +828,97 @@
     // ----HTML----
     function showCalculator() {
         var html_text =
-            '<div class="parameters"><div class="level-info"><div class="input-row"><label>角色星级(暂不含6星装备物属性)</label>' +
-            '<select id="star-select" class="PN-select" onChange="changeStar(this.value)">';
+            '<div class="input-row"><label>（-1表示不装备，0~5表示强化等级）</label></div>' +
+            '<div class="input-row">' + 
+            '<label>左上</label><input type="number" step="1" value="' +
+            calculate_factor.equip1 +
+            '" min="-1" max="5" id="equip1" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>右上</label><input type="number" step="1" value="' +
+            calculate_factor.equip2 +
+            '" min="-1" max="5" id="equip2" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>、角色等级</label><input type="number" step="1" name="level" value="' +
+            calculate_factor.level +
+            '" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)"/>' + 
+            '</div><div class="input-row">' + 
+            '<label>左中</label><input type="number" step="1" value="' +
+            calculate_factor.equip3 +
+            '" min="-1" max="5" id="equip3" class="PN-number" onChange="changeEquip(this.id, this.value)" />' + 
+            '<label>右中</label><input type="number" step="1" value="' +
+            calculate_factor.equip4 +
+            '" min="-1" max="5" id="equip4" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>、星级</label><select id="star-select" class="PN-select" onChange="changeStar(this.value)">';
         for (let i = rarity.length / 2; i >= 1; i--) {
-            if (i === 5) {
-                html_text += '<option value="5" selected="selected">5</option>';
+            if (i === rarity.length / 2) {
+                html_text += '<option value="' + i + '" selected="selected">' + i + '</option>';
             } else {
                 html_text += '<option value="' + i + '">' + i + "</option>";
             }
         }
         html_text +=
-            '</select><label>、角色等级</label><input type="number" step="1" name="level" value="151" min="1" max="300" id="level-select" class="PN-number" onChange="changeLevel(this.value)"/></div>' +
-            '<div class="input-row"><label>专武等级(开发中)</label></div>' +
-            '<div class="input-row"><label>角色rank</label><select id="rank-select" class="PN-select" onChange="changeRank(this.value)">';
-        for (let i = rank_max; i >= 1; i--) {
+            '</select>' + 
+            '<label>、品级</label><select id="rank-select" class="PN-select" onChange="changeRank(this.value)">';
+        for (let i = calculate_factor.rank_max; i >= 1; i--) {
             if (i === calculate_factor.rank) {
                 html_text += '<option value="' + i + '" selected="selected">' + i + "</option>";
             } else {
                 html_text += '<option value="' + i + '">' + i + "</option>";
             }
         }
-        html_text +=
-            '</select></div><div class="input-row"><label>（-1表示不装备，0~5表示强化等级）</label></div><div class="input-row">' +
-            '<label>左上</label><input type="number" step="1" value="' +
-            calculate_factor.equip1 +
-            '" min="-1" max="5" id="equip1" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
-            '<label>左中</label><input type="number" step="1" value="' +
-            calculate_factor.equip3 +
-            '" min="-1" max="5" id="equip3" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+        html_text += '</select></div><div class="input-row">' +  
             '<label>左下</label><input type="number" step="1" value="' +
             calculate_factor.equip5 +
             '" min="-1" max="5" id="equip5" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
-            '<label>右上</label><input type="number" step="1" value="' +
-            calculate_factor.equip2 +
-            '" min="-1" max="5" id="equip2" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
-            '<label>右中</label><input type="number" step="1" value="' +
-            calculate_factor.equip4 +
-            '" min="-1" max="5" id="equip4" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
             '<label>右下</label><input type="number" step="1" value="' +
             calculate_factor.equip6 +
             '" min="-1" max="5" id="equip6" class="PN-number" onChange="changeEquip(this.id, this.value)" />' +
+            '<label>、专武等级</label><input type="number" step="1" name="unique_level" value="' +
+            calculate_factor.unique_level +
+            '" min="0" max="' +
+            calculate_factor.unique_level +
+            '" id="unique-level-select" class="PN-number" onChange="changeUniqueLevel(this.value)" />' + 
+            '<label>、技能等级<span id="skill-range-text">' + 
+            calculate_factor.skill_level + 
+            '</span></label></div><div class="input-row">' +
             '</div><div class="input-row"><label>剧情好感度：</label>';
-
-        var html_end = "</div></div></div>";
-        $("#rarity-calculator").html(html_text + html_love + html_end);
+        
+        var html_skill = '<input type="range" id="unique-range" min="1" max="' + 
+            calculate_factor.skill_level + 
+            '" value="' + 
+            calculate_factor.skill_level + 
+            '" oninput="changeSkillLevel(this.value)"></div>';
+        $("#rarity-calculator").html(html_text + html_love + html_skill);
     }
 
     var $readyRarity = function () {
         calculate_factor.unit_id = $("#PNID")[0].innerHTML.replace("\n", "");
         calculate_factor.unit_name = $("#PNNAME")[0].innerHTML.replace("\n", "");
-        // calculate_factor.level = parseInt($("#level-select")[0].value);
-        // calculate_factor.star = parseInt($("#star-select")[0].value);
-        // calculate_factor.rank = parseInt($("#rank-select")[0].value);
-        loadData();
+        $.getJSON(mw.util.wikiScript("api"), {
+            format: "json",
+            action: "parse",
+            text: "{" + "{#show:全局|?等级|?RANK|?专武等级|headers=hide}}",
+            contentmodel: "wikitext"
+        }).done(function (data) {
+            text = data.parse.text["*"];
+            let all_data = text
+                .split('<td class="smwtype_txt"')
+                .slice(1)
+                .map((value) => {
+                    return value.split(">")[1].split("<")[0];
+                });
+            // level, skill_level, rank, equip1,...equip6
+            calculate_factor.level = parseInt(all_data[0]);
+            calculate_factor.skill_level = parseInt(all_data[0]);
+            let rank = all_data[1].split("-");
+            calculate_factor.rank = parseInt(rank[0]);
+            switch (rank[1]) {
+                case "5":
+                    calculate_factor.equip3 = 5;
+                case "4":
+                    calculate_factor.equip5 = 5;
+            }
+            calculate_factor.unique_level = parseInt(all_data[2]) + 1;
+            loadData();
+        });
 
         // ------
         // 角色页面动态立绘点击显示
@@ -791,7 +957,7 @@
             });
         });
 
-        console.log("%c 属性计算器&动态立绘 %cv0.4.1", "color: #fff; padding: 5px 0; background: #a6ae4d;", "padding: 5px 6px 5px 5px; background: #f6eebd;");
+        console.log("%c 属性计算器&动态立绘 %cv0.6.6", "color: #fff; padding: 5px 0; background: #a6ae4d;", "padding: 5px 6px 5px 5px; background: #f6eebd;");
     };
     (function () {
         var t = function () {
