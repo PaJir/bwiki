@@ -23,12 +23,13 @@ def equipment_craft():
 select d.equipment_id, d.equipment_name, d.description, 
 d.hp, d.atk, d.magic_str, d.def, d.magic_def, d.physical_critical, d.magic_critical, d.wave_hp_recovery, d.wave_energy_recovery, d.dodge, d.life_steal, d.hp_recovery_rate, d.energy_recovery_rate, d.energy_reduce_rate, d.accuracy, 
 r.hp, r.atk, r.magic_str, r.def, r.magic_def, r.physical_critical, r.magic_critical, r.wave_hp_recovery, r.wave_energy_recovery, r.dodge, r.life_steal, r.hp_recovery_rate, r.energy_recovery_rate, r.energy_reduce_rate, r.accuracy 
-from unique_equipment_data d join unique_equipment_enhance_rate r on d.equipment_id = r.equipment_id
+from unique_equipment_data d join unique_equip_enhance_rate r on d.equipment_id = r.equipment_id
 order by d.equipment_id"""
-    cursor.execute(sql_main)
-    all_data = cursor.fetchall()
-    for data in all_data:
-        f.write(write_same(data))
+    # cursor.execute(sql_main)
+    # all_data = cursor.fetchall()
+    all_data = []
+    # for data in all_data:
+    #     f.write(write_same(data))
 
     cursor_jp.execute(sql_main)
     all_data_jp = cursor_jp.fetchall()
@@ -55,4 +56,6 @@ unique_equipment_data: 专用装备的一些数据
 unique_equipment_enhance_rate: 专用装备的强化数据
 skill_action: 各个技能的数值数据
 skill_data: 技能的数据
+日服unique_equipment_enhance_rate表名改为了unique_equip_enhance_rate，
+因此和简中服不通用，故L28-32被注释
 """

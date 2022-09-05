@@ -53,7 +53,7 @@ def audio(id, cur):
     x6 = ""
     if len(desp) == 17:
         x6 = "￥".join(desp[12:17])
-    return x1+split_at+x3+split_at+birth+split_at+x6+split_at*3
+    return (x1+split_at+x3+split_at+birth+split_at+x6+split_at*3).replace("?", "♪")
 # JP RANK装备
 def rank(id):
     if id == "1701":
@@ -62,7 +62,7 @@ def rank(id):
         id = "1076"
     r = []
     # print(id)
-    for i in range(1, 25):
+    for i in range(1, 26):
         sql = "select equip_slot_1, equip_slot_2, equip_slot_3, equip_slot_4, equip_slot_5, equip_slot_6 from unit_promotion" + \
             " where unit_id = " + id + "01 and promotion_level = " + str(i)
         cursor_jp.execute(sql)
@@ -138,7 +138,7 @@ def chara_story_status(id):
         
         ret += split_at
     if len(data_jp) < 11:
-        ret += split_at*(11-len(data_jp))
+        ret += split_at*4
     return ret
 # CN/JP
 def unit_skill_data(id):
@@ -204,8 +204,8 @@ def role_main(data, cur):
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
     # 页面名 角色ID 角色名 翻译名 角色介绍 是否实装（手动） 是否6星（手动）
     f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at+data[3]+split_at+data[0].replace("\\\\n","<br/>")+split_at*3) 
-    # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动） 6星碎片获取（手动）
-    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+data[8]+split_at*3)
+    # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动）
+    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+data[8]+split_at*2)
     # 1星立绘语音 3星立绘语音 生日语音 UB语音 六星UB语音
     f.write(audio(id, cur))
     # 身高 体重 年龄 生日 血型 种族 兴趣 
@@ -227,7 +227,7 @@ def role_main(data, cur):
     f.write(unit_skill_data(id))
     # 起手顺序 行动顺序 
     f.write(attack_pattern(id, cur))
-    # R1-R24
+    # R1-R25
     f.write(rank(id))
     # R1-R24属性
     # f.write(unit_promotion_status(id))

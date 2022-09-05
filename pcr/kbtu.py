@@ -8,14 +8,10 @@ import multiprocessing as mp
 # 浅色人物 1
 # 深色背景 2
 # 深色人物 3
-inputPath = "D:\Extra\pcr\GIF\香澄（魔法少女）"
+inputPath = "D:\Extra\pcr\GIF\茜里（天使）"
 outputPath = inputPath + "2"
 # inputPath = "D:\Extra\pcr\Q\\bandicam"
 # outputPath = "D:\Extra\pcr\Q\\nobg"
-# lightFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 0.png"
-# lightFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 0.png"
-# darkFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 1.png"
-# darkFile = "D:\Extra\pcr\GIF\克莉丝提娜（圣诞节）\\0 1.png"
 lightStart = "2"
 darkStart = "1"
 

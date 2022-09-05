@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from role import unit_skill_data, rank
+from config import split_at
 
 fields = ["角色ID",
           "角色名",
@@ -111,6 +112,7 @@ fields = ["角色ID",
           "R22",
           "R23",
           "R24",
+          "R25",
           "1x属性",
           "1x属性强化",
           "2x属性",
@@ -157,7 +159,7 @@ def process():
 
 def skill_rank(field_map):
     id = field_map["角色ID"]
-    db_skill = unit_skill_data(id).split("@")[1:]
+    db_skill = unit_skill_data(id).split(split_at)[1:]
     if db_skill[0] != "":
         field_map["UB"] = db_skill[0]
         field_map["UB图"] = db_skill[1]
@@ -195,8 +197,8 @@ def skill_rank(field_map):
     if db_skill[34] != "":
         field_map["专属技能描述"] = db_skill[34]
     
-    rk = rank(id).split("@")
-    for i in range(20, 24):
+    rk = rank(id).split(split_at)
+    for i in range(20, 25):
         field_map["R" + str(i+1)] = rk[i]
 
 
@@ -215,13 +217,15 @@ def read_xml():
             for d in data:
                 eq_idx = d.find("=")
                 field = d[:eq_idx]
-                value = d[eq_idx+1:]
+                value = d[eq_idx+1:].replace("\n\n", "<br>").replace("\n", "")
                 field_map[field] = value
             skill_rank(field_map)
             output = []
             for field in fields:
-                output.append("|" + field + "=" + field_map.get(field, ""))
-            output = "{{角色\n" + "\n".join(output) + "}}\n"
+                # output.append("|" + field + "=" + field_map.get(field, ""))
+                output.append(field_map.get(field, ""))
+            # output = "{{角色\n" + "\n".join(output) + "}}\n"
+            output = field_map.get("翻译名", "") + "\t" + "\t".join(output) + "\n"
             wf.write(output)
 
 

@@ -2,14 +2,11 @@ import os
 import sqlite3
 import io
 import sys
-
-db_name_cn = "redive_cnx.db"
-data_path_cn = "../../pcr-tool-sql-diff/cn/data"
-db_name_jp = "rediv_jpx.db"
-data_path_jp = "../../redive_master_db_diff"
+from config import *
 
 
 def create(db_name, data_path):
+    """生成db"""
     if os.path.exists(db_name):
         os.remove(db_name)
     conn = sqlite3.connect(db_name)
@@ -40,7 +37,7 @@ if __name__ == "__main__":
     print("start")
     where = sys.argv[1]
     if where == 'cn':
-        create(db_name_cn, data_path_cn)
+        create(db_name, data_path)
     elif where == 'jp':
         create(db_name_jp, data_path_jp)
     else:
