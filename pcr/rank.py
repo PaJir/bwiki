@@ -99,9 +99,9 @@ with open("./rank_input.txt", encoding="utf-8") as rf:
             # 角色
             wf.write(kv.get(name, name))
             # 定位 会战 竞技进攻 竞技防守 六星特性 星级 专武等级 专武解锁 升级 培养顺序
-            str2 = "|"+line[2]+"|"+line[3]+"|"+line[4]+"|"+line[5]+"|"+line[6]+"|"+line[7]+"|"+line[8]+"|"+line[9]+"|"+line[10]+"|"+line[11]
+            str2 = "|"+line[3]+"|"+line[4]+"|"+line[5]+"|"+line[6]+"|"+line[7]+"|"+line[8]+"|"+line[9]+"|"+line[10]+"|"+line[11]+"|"+line[12]
             # 花舞RANK推荐U 说明/备注V
-            str2 += "|"+line[18]+"|"+line[19]+"}}\n"
+            str2 += "|"+line[19]+"|"+line[20]+"}}\n"
             # str2.replace("~~~", "<nowiki>~~~</nowiki>")
             wf.write(str2)
             # break
