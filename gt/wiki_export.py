@@ -4,6 +4,7 @@ input_file = "./wiki_export.xml"
 output_file = "./wiki_export.txt"
 
 fields = ["未实装",
+"简称",
 "名字",
 "星级",
 "职业",
@@ -26,6 +27,10 @@ fields = ["未实装",
 "特殊技能基础伤害倍率",
 "专武技能基础伤害倍率",
 "连携技能基础伤害倍率",
+"普通攻击基础伤害倍率2",
+"特殊技能基础伤害倍率2",
+"专武技能基础伤害倍率2",
+"连携技能基础伤害倍率2",
 "连携发起状态",
 "连携效果",
 "连携技能",
@@ -183,12 +188,6 @@ fields = ["未实装",
 "皮肤48价格",
 "皮肤49名称",
 "皮肤49价格",
-"UP活动1",
-"UP时间1",
-"UP活动2",
-"UP时间2",
-"UP活动3",
-"UP时间3",
 "低阶攻击觉醒石",
 "中阶攻击觉醒石",
 "高阶攻击觉醒石",
@@ -274,7 +273,8 @@ def read_xml():
                 value = d[eq_idx+1:].replace("\n\n", "<br>").replace("\n", "")
                 field_map[field] = value
                 if field not in fields:
-                    print(field_map["名字"], field)
+                    print(field)
+                    # print(field_map["名字"], field)
             output = []
             for field in fields:
                 # output.append("|" + field + "=" + field_map.get(field, ""))
