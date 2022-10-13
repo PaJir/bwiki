@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 
+# 这个文件导出自https://wiki.biligame.com/gt/%E7%89%B9%E6%AE%8A:%E5%AF%BC%E5%87%BA%E9%A1%B5%E9%9D%A2
+# 分类为「角色」
 input_file = "./wiki_export.xml"
+# 输出文件的内容直接复制到表格中
 output_file = "./wiki_export.txt"
 
 fields = ["未实装",
