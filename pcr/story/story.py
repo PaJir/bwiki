@@ -18,7 +18,7 @@ in_path = "./unit"
 # in_path = "./battle"
 out_path = in_path + "_out"
 
-start_episode = "001"  # from 000 or 001
+start_episode = "000"  # from 000 or 001
 include_empty_title = True
 
 
@@ -38,7 +38,8 @@ rep = {
     "103112": "103111", "105213": "105211", "105612": "105611",
     "105812": "105811", "105913": "105911", "106012": "106011",
     "106412": "106411", "106613": "106611", "106834": "106803",
-    "110812": "110811", "111412": "111411", "112912": "112911"
+    "110812": "110811", "111412": "111411", "112912": "112911",
+    "114612": "114611", "115512": "115511"
 }
 
 
@@ -82,6 +83,27 @@ def transform(in_file, out_file, first=False, _title=""):
     bgm_cur = 1
     ttt = 0
     # shake = False
+    episode = in_file[14:17]
+    if in_path == "./activity" and in_file[10] == '5':
+        if episode == "202":
+            wf.write("==首领战相关==\n===普通解锁===\n")
+        elif episode == "203":
+            wf.write("===普通获胜===\n")
+        elif episode == "204":
+            wf.write("===困难解锁===\n")
+        elif episode == "301":
+            wf.write("===普通挑战===\n")
+        elif episode == "302":
+            wf.write("===困难挑战===\n")
+        elif episode == "308":
+            wf.write("===高难挑战===\n")
+        elif episode == "321":
+            wf.write("===SP挑战===\n")
+        elif episode == "322":
+            wf.write("===SP升阶段2===\n")
+        elif episode == "323":
+            wf.write("===SP升阶段3===\n")
+
     while line:
         # print(ttt, line)
         line = line[:-1]
@@ -94,20 +116,32 @@ def transform(in_file, out_file, first=False, _title=""):
             # black_in = title
             wf.write("==")
             # wf.write("第" + title.split("第")[-1])
-            episode = in_file[14:17]
             if in_path == "./activity":
                 if episode == "000":
-                    wf.write("序章")
+                    wf.write("序章 ")
                 elif episode == "007":
-                    wf.write("终章")
+                    wf.write("终章 ")
                 elif episode == "101":
-                    wf.write("预告")
+                    wf.write("预告 ")        
+                elif episode == "401":
+                    wf.write("=困难获胜·")
+                elif episode == "402":
+                    wf.write("=高难获胜·")
+                elif episode == "403":
+                    wf.write("=击破10只·")
+                elif episode == "404":
+                    wf.write("=击破20只·")
+                elif episode == "405":
+                    wf.write("=击破30只·")
+                elif episode in ["406", "407", "408", "409", "410"]:
+                    pass
                 else:
-                    wf.write("第" + episode[2] + "话")
+                    wf.write("第" + episode[2] + "话 ")
             else:
-                wf.write("第" + episode[2] + "话")
-            wf.write(" " + black_in + "==\n")
-            wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + outline + "\n}" + "}\n")
+                wf.write("第" + episode[2] + "话 ")
+            wf.write(black_in + "==\n")
+            if outline not in ["", " ", "\t"]:
+                wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + outline + "\n}" + "}\n")
         elif line == "chord_l":  # type / chord_l 对话角色转换
             chord = getNext(rf)
             chord = replaceId(chord)
@@ -183,6 +217,15 @@ if __name__ == "__main__":
             continue
         out_file = in_file[:14] + ".txt"
         episode = in_file[14:17]
+        if in_path == "./activity":
+            if episode in ["422", "423", "424", "425"]:
+                continue
+        if in_file[10] == '5':
+            start_episode = "000"
+        elif in_file[10] == '6':
+            start_episode = "101"
+        else:
+            start_episode = "001"
         first = True if episode == start_episode else False  # TODO: 000 or 001
         # out_file = in_file[:17] + ".txt"
         # first = True
