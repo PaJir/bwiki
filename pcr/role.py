@@ -46,7 +46,7 @@ def audio(id, cur):
         d = cur.fetchone()
         if d is None:
             break
-        desp.append(d[0].replace("\\\\n","<br/>").replace("\\n", "<br/>"))
+        desp.append(d[0].replace("\\\\n","<br/>").replace("\\n", "<br/>").replace("\\u3000", "　"))
     x1 = "￥".join(desp[0:5])
     x3 = "￥".join(desp[5:10])
     birth = "￥".join(desp[10:12])
@@ -62,7 +62,7 @@ def rank(id):
         id = "1076"
     r = []
     # print(id)
-    for i in range(1, 26):
+    for i in range(1, 29):
         sql = "select equip_slot_1, equip_slot_2, equip_slot_3, equip_slot_4, equip_slot_5, equip_slot_6 from unit_promotion" + \
             " where unit_id = " + id + "01 and promotion_level = " + str(i)
         cursor_jp.execute(sql)
@@ -202,8 +202,8 @@ def role_main(data, cur):
     atk_type = "物理" if data[18] == 1 else "魔法"
     # 生日
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
-    # 页面名 角色ID 角色名 翻译名 角色介绍 是否实装（手动） 是否6星（手动）
-    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at+data[3]+split_at+data[0].replace("\\\\n","<br/>")+split_at*3) 
+    # 页面名 角色ID 角色名/手动 日文名/手动 翻译名 片假名/手动 平假名/手动 角色介绍 是否实装/手动 是否专武/手动 是否6星/手动
+    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>")+split_at*4) 
     # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动）
     f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+data[8]+split_at*2)
     # 1星立绘语音 3星立绘语音 生日语音 UB语音 六星UB语音
@@ -227,7 +227,7 @@ def role_main(data, cur):
     f.write(unit_skill_data(id))
     # 起手顺序 行动顺序 
     f.write(attack_pattern(id, cur))
-    # R1-R25
+    # R1-R28
     f.write(rank(id))
     # R1-R24属性
     # f.write(unit_promotion_status(id))
