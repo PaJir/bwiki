@@ -52,15 +52,15 @@ def getPixelColor(fileName):
 
 def zoomIn(old_image, new_image, pow, left, right, top, down):
     inData = getPixelColor(old_image)
-    height = (down-top)*pow
-    width = (right-left)*pow
+    height = int((down-top)*pow)
+    width = int((right-left)*pow)
     if len(inData) == 64:
         return
     outData = np.zeros([height, width, 4])
     for i in range(height):
         for j in range(width):
-            x = (i//pow) + top
-            y = (j//pow) + left
+            x = int(i//pow) + top
+            y = int(j//pow) + left
             outData[i][j] = [inData[x][y][0], inData[x][y][1], inData[x][y][2], inData[x][y][3]] 
     outData = np.uint8(outData)
     im = Image.fromarray(outData)
@@ -92,7 +92,7 @@ def create_gif(skill_path, role_name):
 
     # Save them as frames into a gif
     # imageio.mimsave(gif_name, frames, 'GIF', duration=0.1, loop=0)
-    frames[0].save(gif_name, save_all=True, append_images=frames[1:], loop=1, duration=durations, disposal=2)
+    frames[0].save(gif_name, save_all=True, append_images=frames[1:], loop=0, duration=durations, disposal=2)
     print("ok " + role_name)
     return
 
@@ -105,16 +105,22 @@ def main(path, role_name):
             continue
         if file == "pixelart":
             front_path = os.path.join(full_path, "front")
+            front_path512 = os.path.join(full_path, "front512")
             if os.path.exists(front_path):
                 fronts = os.listdir(front_path)
                 fronts.sort()
                 fronts = list(filter(lambda x: x.endswith(".png"), fronts))
                 if len(fronts) > 0:
                     zoomIn(os.path.join(front_path, fronts[0]), os.path.join(root_path, role_name + "-front.png"), 5, 118, 138, 109, 129)
-
-            skill_path = os.path.join(full_path, "skill")
-            if os.path.exists(skill_path):
-                create_gif(skill_path, role_name + "-skill")
+            elif os.path.exists(front_path512):
+                fronts = os.listdir(front_path512)
+                fronts.sort()
+                fronts = list(filter(lambda x: x.endswith(".png"), fronts))
+                if len(fronts) > 0:
+                    zoomIn(os.path.join(front_path512, fronts[0]), os.path.join(root_path, role_name + "-front512.png"), 2.5, 236, 276, 218, 258)
+            # skill_path = os.path.join(full_path, "skill")
+            # if os.path.exists(skill_path):
+            #     create_gif(skill_path, role_name + "-skill")
 
             special_path = os.path.join(full_path, "special")
             if os.path.exists(special_path):

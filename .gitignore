@@ -7,3 +7,8 @@ __pycache__
 *.xml
 *.png
 *.jpg
+*.gif
+gacha_resourse
+build
+dist
+*.spec
