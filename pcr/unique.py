@@ -13,7 +13,7 @@ cursor_jp = conn_jp.cursor()
 def write_same(data):
     s = str(data[0]) + split_at
     for i in range(0, 33):
-        s += str(data[i]).replace("\\n","<br/>") + split_at
+        s += str(data[i]).replace("\\\\n","<br/>").replace("\\n","<br/>") + split_at
     return s + "\n"
 
 def equipment_craft():

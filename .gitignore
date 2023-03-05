@@ -8,6 +8,8 @@ __pycache__
 *.png
 *.jpg
 *.gif
+*.zip
+*.rar
 gacha_resourse
 build
 dist

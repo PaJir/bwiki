@@ -53,7 +53,7 @@ def audio(id, cur):
     x6 = ""
     if len(desp) == 17:
         x6 = "￥".join(desp[12:17])
-    return (x1+split_at+x3+split_at+birth+split_at+x6+split_at*3).replace("?", "♪")
+    return (x1+split_at+x3+split_at+birth+split_at+x6+split_at*3).replace("?", "♪").replace("\\u3000", "　")
 # JP RANK装备
 def rank(id):
     if id == "1701":
@@ -115,26 +115,27 @@ def chara_story_status(id):
             ret += "无变化"+split_at+"无变化"+split_at
         elif i == 2 and len(data_jp) == 3:
             ret += "无变化"+split_at+"无变化"+split_at
-        if data is not None and len(data) >= i + 1:
-            ret += status_map[data[i][1]] + "+" + str(data[i][2])
-            if data[i][3] > 0:
-                ret += "、" + status_map[data[i][3]] + "+" + str(data[i][4])
-            if data[i][5] > 0:
-                ret += "、" + status_map[data[i][5]] + "+" + str(data[i][6])
-            if data[i][7] > 0:
-                ret += "、" + status_map[data[i][7]] + "+" + str(data[i][8])
-            if data[i][9] > 0:
-                ret += "、" + status_map[data[i][9]] + "+" + str(data[i][10])
-        else:
-            ret += status_map[d_jp[1]] + "+" + str(d_jp[2])
-            if d_jp[3] > 0:
-                ret += "、" + status_map[d_jp[3]] + "+" + str(d_jp[4])
-            if d_jp[5] > 0:
-                ret += "、" + status_map[d_jp[5]] + "+" + str(d_jp[6])
-            if d_jp[7] > 0:
-                ret += "、" + status_map[d_jp[7]] + "+" + str(d_jp[8])
-            if d_jp[9] > 0:
-                ret += "、" + status_map[d_jp[9]] + "+" + str(d_jp[10])
+        # 全部用日服数据
+        # if data is not None and len(data) >= i + 1:
+        #     ret += status_map[data[i][1]] + "+" + str(data[i][2])
+        #     if data[i][3] > 0:
+        #         ret += "、" + status_map[data[i][3]] + "+" + str(data[i][4])
+        #     if data[i][5] > 0:
+        #         ret += "、" + status_map[data[i][5]] + "+" + str(data[i][6])
+        #     if data[i][7] > 0:
+        #         ret += "、" + status_map[data[i][7]] + "+" + str(data[i][8])
+        #     if data[i][9] > 0:
+        #         ret += "、" + status_map[data[i][9]] + "+" + str(data[i][10])
+        # else:
+        ret += status_map[d_jp[1]] + "+" + str(d_jp[2])
+        if d_jp[3] > 0:
+            ret += "、" + status_map[d_jp[3]] + "+" + str(d_jp[4])
+        if d_jp[5] > 0:
+            ret += "、" + status_map[d_jp[5]] + "+" + str(d_jp[6])
+        if d_jp[7] > 0:
+            ret += "、" + status_map[d_jp[7]] + "+" + str(d_jp[8])
+        if d_jp[9] > 0:
+            ret += "、" + status_map[d_jp[9]] + "+" + str(d_jp[10])
         
         ret += split_at
     if len(data_jp) < 11:

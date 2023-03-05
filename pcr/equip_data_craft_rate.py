@@ -27,7 +27,7 @@ def write_same(data):
     s = ""
     s += str(data[0]) + " "
     for i in range(37):
-        s += str(data[i]).replace("\\n","<br/>").replace(" ", "") + " "
+        s += str(data[i]).replace("\\\\n","<br/>").replace("\\n","<br/>").replace(" ", "") + " "
     s += str(lowest_rank(data[0])) + " "
     s += str(lowest_map(data[0])) + " "
     # s += " "
