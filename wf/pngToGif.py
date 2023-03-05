@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 
 root_path = ".\\"
+output_path = ".\\output"
 reuse_files = True # 复用之前生成的文件
 
 def gen_frame(path):
@@ -111,13 +112,13 @@ def main(path, role_name):
                 fronts.sort()
                 fronts = list(filter(lambda x: x.endswith(".png"), fronts))
                 if len(fronts) > 0:
-                    zoomIn(os.path.join(front_path, fronts[0]), os.path.join(root_path, role_name + "-front.png"), 5, 118, 138, 109, 129)
+                    zoomIn(os.path.join(front_path, fronts[0]), os.path.join(output_path, role_name + "-front.png"), 5, 118, 138, 109, 129)
             elif os.path.exists(front_path512):
                 fronts = os.listdir(front_path512)
                 fronts.sort()
                 fronts = list(filter(lambda x: x.endswith(".png"), fronts))
                 if len(fronts) > 0:
-                    zoomIn(os.path.join(front_path512, fronts[0]), os.path.join(root_path, role_name + "-front512.png"), 2.5, 236, 276, 218, 258)
+                    zoomIn(os.path.join(front_path512, fronts[0]), os.path.join(output_path, role_name + "-front512.png"), 2.5, 236, 276, 218, 258)
             # skill_path = os.path.join(full_path, "skill")
             # if os.path.exists(skill_path):
             #     create_gif(skill_path, role_name + "-skill")
@@ -133,5 +134,7 @@ def main(path, role_name):
 
 
 if __name__ == "__main__":
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     main(root_path, "_root")
 # print(l, r, t, d)
