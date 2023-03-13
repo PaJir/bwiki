@@ -2,6 +2,7 @@
 import os
 from PIL import Image
 import numpy as np
+from en2cn import en2cn
 
 root_path = ".\\"
 output_path = ".\\output"
@@ -70,7 +71,7 @@ def zoomIn(old_image, new_image, pow, left, right, top, down):
 
 def create_gif(skill_path, role_name):
     print("start " + skill_path)
-    gif_name = os.path.join(root_path, role_name) + ".gif"
+    gif_name = os.path.join(output_path, role_name) + ".gif"
     if reuse_files == True and os.path.exists(gif_name):
         return
     image_list = os.listdir(skill_path)
@@ -107,25 +108,28 @@ def main(path, role_name):
         if file == "pixelart":
             front_path = os.path.join(full_path, "front")
             front_path512 = os.path.join(full_path, "front512")
+            role_name_cn = en2cn(role_name)
+            if role_name_cn == "":
+                role_name_cn = role_name
             if os.path.exists(front_path):
                 fronts = os.listdir(front_path)
                 fronts.sort()
                 fronts = list(filter(lambda x: x.endswith(".png"), fronts))
                 if len(fronts) > 0:
-                    zoomIn(os.path.join(front_path, fronts[0]), os.path.join(output_path, role_name + "-front.png"), 5, 118, 138, 109, 129)
+                    zoomIn(os.path.join(front_path, fronts[0]), os.path.join(output_path, role_name_cn + "-front.png"), 5, 118, 138, 109, 129)
             elif os.path.exists(front_path512):
                 fronts = os.listdir(front_path512)
                 fronts.sort()
                 fronts = list(filter(lambda x: x.endswith(".png"), fronts))
                 if len(fronts) > 0:
-                    zoomIn(os.path.join(front_path512, fronts[0]), os.path.join(output_path, role_name + "-front512.png"), 2.5, 236, 276, 218, 258)
+                    zoomIn(os.path.join(front_path512, fronts[0]), os.path.join(output_path, role_name_cn + "-front512.png"), 2.5, 236, 276, 218, 258)
             # skill_path = os.path.join(full_path, "skill")
             # if os.path.exists(skill_path):
-            #     create_gif(skill_path, role_name + "-skill")
+            #     create_gif(skill_path, role_name_cn + "-skill")
 
             special_path = os.path.join(full_path, "special")
             if os.path.exists(special_path):
-                create_gif(special_path, role_name + "-special")
+                create_gif(special_path, role_name_cn + "-special")
             return
         elif file in ["0怪物", "build", "dist"]:
             continue

@@ -17,6 +17,7 @@ names = {
     "zeta": "塞达",
     "alk": "阿尔克",
     "dragon_slayer": "阿赛尔",
+    "dragon_slayer_smr21": "阿赛尔(泳装)",
     "lady_summoner": "碧安卡",
     "kunoichi": "花火",
     "half_oni_boy": "阿须桐丸",
@@ -77,6 +78,7 @@ names = {
     "desert_wizard": "莫迪亚迦",
     "onmyo_attendant": "蛟",
     "psycho_reaper": "索维",
+    "psycho_reaper_smr21": "索维(泳装)",
     "unicorn_lancer_smr20": "杰拉尔(泳装)",
     "pirates_girl_smr20": "玛丽娜(泳装)",
     "shy_assassin": "薇薇",
@@ -89,6 +91,7 @@ names = {
     "nurse": "艾尔莎",
     "wolf_assassin": "克劳斯",
     "fox_companion": "白乃",
+    "fox_companion_smr21": "白乃(泳装)",
     "depraved_monk": "诲谕",
     "sailor_girl": "拉蒂",
     "cute_fafnir": "法夫",
@@ -99,11 +102,13 @@ names = {
     "scout_girl": "莉塔",
     "slango_blue": "蓝波露",
     "fox_oracle": "稻穗",
+    "fox_oracle_smr21": "稻穗(泳装)",
     "cagliostro": "卡莉奥丝特罗",
     "samurai_xm19": "宗士郎(圣诞)",
     "thunder_archer": "梅媞斯",
     "mighty_striker": "巴拉克",
     "machine_police_girl": "塞拉",
+    "machine_police_girl_smr21": "塞拉(泳装)",
     "big_gunner": "牡丹",
     "illusionist_smr20": "伊路米(泳装)",
     "dimension_witch_smr20": "贝尔赛蒂亚(泳装)",
@@ -151,6 +156,7 @@ names = {
     "katana_ghost": "丛云",
     "mercenary": "雷恩",
     "bigwing_shaman": "西微",
+    "bigwing_shaman_smr21": "西微(泳装)",
     "gentle_barten": "米格里",
     "kokkoro": "可可萝",
     "wind_dragon": "休尔特",
@@ -197,6 +203,7 @@ names = {
     "ruin_girl": "奈芙提姆",
     "prince_zero": "拉杰尔特",
     "bodysuit_trooper": "艾可莉儿",
+    "bodysuit_trooper_smr21": "艾可莉儿(泳装)",
     "fox_oracle_xm19": "稻穗(圣诞)",
     "starbreak_hunter": "塔吉斯",
     "combat_soldier": "贝瑞塔",
@@ -224,6 +231,7 @@ names = {
     "bishop_girl_smr20": "莉洁儿(泳装)",
     "keylock_girl": "琪亚娜",
     "resistance_princess": "莉莉丝",
+    "resistance_princess_smr21": "莉莉丝(泳装)",
     "doctor_machine": "梅克",
     "woman_knight_1anv": "赛希莉亚(周年)",
     "sea_violent": "蒂蕾特",
@@ -292,6 +300,17 @@ names = {
     "delusion_girl_xm20": "梅利露(圣诞)",
     "mummy_boy": "塔尔哈",
     "revenge_rabbit": "柯蒂",
+    "tengu_master": "豪岚",
+    "tsundere_bountyhunter": "蕾提希亚",
+    "holy_mother": "娜莉亚",
+    "stylish_witch": "花颂",
+    "dress_gunner": "爱芙琳",
+    "elder_guild_fighter": "马其斯",
+    "bird_master": "鲁马尔克",
+    "rookie_adventurer": "米蕾特",
+    "desert_priest": "莎里赫",
+    "blackflower_wiz": "普莉姆菈",
+    "assistant_boy": "鲁斯尔",
     # boss
     "multi_battle_pickup_empress": "青之女王",
     "white_tiger_ghost": "白虎",
@@ -308,8 +327,157 @@ names = {
     "guardian_golem": "废墟魔像",
     "guardian_totem": "废墟守卫·火",
     "owl": "维·索拉斯",
+    # future
+    "stella": "史黛拉",
+    "light": "莱特",
+    "砂漠の領主": "沙漠领主",
+    "load_of_sand": "沙漠领主",
+    "領主の少年?ローラン": "少年领主",
+    "loran": "罗兰",
+    "stella_copy_known": "面具术士",
+    "仮面の術者": "面具术士",
+    "海贼A": "海盗A",
+    "海贼B": "海盗B",
+    "海贼船长": "海盗船长",
+    "dog_king": "犬族之王",
+    "elder_cat": "猫长老",
+    "admin_human": "管理者(人)",
+    "mob_onmitsu": "护卫",
+    "big_orga": "大鬼",
+    "stella_copy_mask_off": "史黛拉？",
+    "flame_witch_known": "红发老战士",
+    "flame_witch": "夏可缇",
+    "devil_commander_known": "魔族男性",
+    "devil_commander_unknown": "？？？",
+    "devil_commander": "伊尔比斯",
+    "gaunt_women": "消瘦的女子",
+    "old_mermaid_man_known": "爷爷",
+    "refugees_boy_known": "难民男孩",
+    "refugees_boy": "艾力克",
+    "refugees_women": "难民女子",
+    "refugees_child": "难民小孩",
+    "refugees_man": "难民男子",
+    "knight_leaders": "干部青年",
+    "knight_length_mob": "骑士长",
+    "knight_mob": "骑士",
+    "soldier_mob": "士兵",
+    "guard_man": "警卫兵",
+    "elf_princess_disguise_unknown": "？？？",
+    "elf_princess_disguise_known": "精灵少女",
+    "elf_princess_disguise": "莉艾尔",
+    "tree_people": "木桩",
+    "devil_leader_known": "戴兜帽的男子",
+    "devil_leader_known2": "魔族男性",
+    "devil_leader_unknown": "？？？",
+    "elf_warrior_unknown": "？？？",
+    "elf_warrior": "精灵战士",
+    "elf_princess_known": "莉艾尔？",
+    "golden_dragon": "拉夫马诺",
+    "elves_voice_only": "精灵们的声音",
+    "refugees_mob": "难民",
+    "maou": "魔王",
+    "crude_man": "粗鲁的人",
+    "gloomy_man": "阴郁的人",
+    "devil_sismama_unknown": "？？？",
+    "devil_sismama": "梅莉",
+    "devil_ylbis": "伊尔比斯",
+    "demons_people": "魔族",
+    "demons_soldier": "魔族之兵",
+    "victory_voice": "战斗声",
+    "demons_executive": "魔族干部",
 }
+# 如果name和filename不同，则添加到下面
+filenames = {
+    "flame_witch_known": "夏可缇",
+    "devil_commander_known": "伊尔比斯",
+    "devil_commander_unknown": "伊尔比斯_unknown",
+    "gaunt_women": "",
+    "old_mermaid_man_known": "",
+    "refugees_boy_known": "艾力克",
+    "refugees_women": "",
+    "refugees_child": "",
+    "refugees_man": "",
+    "knight_leaders": "",
+    "knight_length_mob": "",
+    "knight_mob": "",
+    "soldier_mob": "",
+    "guard_man": "",
+    "elf_princess_disguise_unknown": "",
+    "elf_princess_disguise_known": "", # 莉艾尔
+    "elf_princess_disguise": "",
+    "tree_people": "",
+    "devil_leader_known": "",
+    "devil_leader_known2": "艾迪凯斯",
+    "devil_leader_unknown": "艾迪凯斯_unknown",
+    "elf_warrior_unknown": "",
+    "elf_warrior": "",
+    "elf_princess_unknown": "艾丝缇莉艾尔_unknown",
+    "elf_princess_known": "艾丝缇莉艾尔",
+    "elves_voice_only": "",
+    "refugees_mob": "",
+    "crude_man": "",
+    "gloomy_man": "",
+    "devil_sismama_unknown": "梅莉",
+    "devil_ylbis": "伊尔比斯_ylbis",
+    "demons_people": "",
+    "demons_soldier": "",
+    "victory_voice": "",
+    "demons_executive": "",
+}
+
 
 def en2cn(en):
     en = en.replace(".png", "").replace(".jpg", "")
     return names.get(en, "")
+
+def en2f(en):
+    en = en.replace(".png", "").replace(".jpg", "")
+    return filenames.get(en, names.get(en, ""))
+
+def story_no_chapter():
+    wf = open("en2cn.txt", "w+", encoding="utf-8")
+    with open("en.txt", "r", encoding="utf-8") as rf:
+        line = rf.readline()
+        while line:
+            line = line.replace("\n", "").replace("\\n", "<br>").split("\t")
+            cn = en2cn(line[0])
+            f = en2f(line[1])
+            if cn == "":
+                wf.write("{{对话||" + line[0] + "|" + line[1] + "}}\n")
+            else:
+                wf.write("{{对话|" + f + "|" + cn + "|" + line[1] + "}}\n")
+            line = rf.readline()
+    wf.close()
+
+def story_with_chapter():
+    chapter = open("enChapter.txt", "r", encoding="utf-8")
+    wf = open("en2cn.txt", "w+", encoding="utf-8")
+    idx = "00"
+    with open("en.txt", "r", encoding="utf-8") as rf:
+        line = rf.readline()
+        while line:
+            line = line.replace("\n", "").replace("\\n", "<br>").split("\t")
+            if line[1] == "1":
+                line = rf.readline()
+                continue
+            if idx != line[0]: # new chapter
+                idx = line[0]
+                c = chapter.readline()
+                c = c.replace("\n", "").replace("\\n", "<br>").split("\t")
+                wf.write("==" + c[0] + "==\n")
+                wf.write("{{折叠|宽度=100%\n")
+                wf.write("|标题=剧情梗概\n")
+                wf.write("|内容=" + c[1] + "\n")
+                wf.write("}}\n")
+            cn = en2cn(line[1])
+            f = en2f(line[1])
+            if cn == "":
+                wf.write("{{对话||" + line[1] + "|" + line[2] + "}}\n")
+            else:
+                wf.write("{{对话|" + f + "|" + cn + "|" + line[2] + "}}\n")
+            line = rf.readline()
+    wf.close()
+
+if __name__ == "__main__":
+    # story
+    story_with_chapter()
