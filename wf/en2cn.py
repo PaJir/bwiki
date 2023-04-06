@@ -424,7 +424,37 @@ filenames = {
     "victory_voice": "",
     "demons_executive": "",
 }
-
+# 技能名
+skillnames = {
+    "atk_all_direction": "朝不同方向攻击",
+    "atk_surround": "攻击自己周围区域",
+    # "atk_back": "",
+    "atk_common": "攻击",
+    "atk_field": "领域全体效果",
+    "atk_four_ranges": "上下左右方向攻击",
+    "atk_four_ranges_cross": "对角线方向攻击",
+    "atk_front": "前进攻击",
+    "atk_front_back": "前后方向攻击",
+    "atk_go_direction": "行进方向攻击",
+    "atk_hit": "对击中的敌人有效",
+    "atk_nearest": "攻击最近的敌人",
+    "fever": "FEVER槽提升",
+    "flip": "强化弹射伤害上升",
+    "float": "浮游",
+    "heal": "治疗",
+    "invincible": "无敌",
+    "multi_ball": "协力球",
+    "multi_bomb": "炸弹协力球",
+    "penet": "贯穿",
+    "poison": "中毒",
+    "regene": "再生",
+    "resist": "弱体抗性上升",
+    "resist_up_purple": "暗属性抗性上升",
+    "resist_up_red": "火属性抗性上升",
+    "resist_up_white": "光属性抗性上升",
+    "skill_str_up": "技能伤害上升",
+    "str_up": "攻击力上升",
+}
 
 def en2cn(en):
     en = en.replace(".png", "").replace(".jpg", "")
@@ -433,6 +463,10 @@ def en2cn(en):
 def en2f(en):
     en = en.replace(".png", "").replace(".jpg", "")
     return filenames.get(en, names.get(en, ""))
+
+def en2skill(en):
+    en = en.split("/")[-1]
+    return skillnames.get(en, en)
 
 def story_no_chapter():
     wf = open("en2cn.txt", "w+", encoding="utf-8")
