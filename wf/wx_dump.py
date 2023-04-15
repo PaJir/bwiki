@@ -11,7 +11,7 @@ ICON_WEAPO = "./wx_icon_weapo.json"
 OUTPUT_FILE = "./wx_dump.txt"
 
 fix_name = {
-    "舒尔特": "凉风",
+    "舒尔特": "休尔特",
     "帕亚舒战斧": "帕拉修",
     "八尺镜": "八咫镜",
     "八尺琼曲玉": "八尺琼勾玉",
@@ -87,7 +87,8 @@ def weapo_id_to_name(id):
         return ""
     return fix_name.get(cnname, cnname)
 
-for plate_idx in range(0, min(600, len(party))):
+start = 500
+for plate_idx in range(start, min(start+100, len(party))):
     plate = party[plate_idx]
     c = [""] * 6
     w = [""] * 6
@@ -117,7 +118,6 @@ for plate_idx in range(0, min(600, len(party))):
     title = ""
     if plate["description"]:
         title += plate["description"]
-    print(title)
     source = plate["source"].strip()
     if source != "待补充":
         if source.find("bilibili") != -1 or source.find("b23") != -1:
@@ -140,4 +140,3 @@ for plate_idx in range(0, min(600, len(party))):
     for i in range(6):
         wf.write("|%s|%s|%s\n" % (c[i], w[i], info[i]))
     wf.write("|标题=%s|%s|%s\n}}" % (title, bad_plate, plate["property"]))
-    
