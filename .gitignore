@@ -14,3 +14,4 @@ gacha_resourse
 build
 dist
 *.spec
+*.json
