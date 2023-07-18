@@ -4,11 +4,9 @@
 
 [WIKI更新计划日志](https://wiki.biligame.com/pcr/WIKI%E6%9B%B4%E6%96%B0%E8%AE%A1%E5%88%92%E6%97%A5%E5%BF%97) （现已转到TeamBition上）
 
-[WIKI建议留言板](https://wiki.biligame.com/pcr/WIKI%E5%BB%BA%E8%AE%AE%E7%95%99%E8%A8%80%E6%9D%BF%EF%BC%88%E5%BF%85%E5%9B%9E%EF%BC%89) 
-
 [模块:GetItemID/data](https://wiki.biligame.com/pcr/%E6%A8%A1%E5%9D%97:GetItemID/data) （终于废弃了）
 
-[日历维护](https://wiki.biligame.com/pcr/MediaWiki:EventCalendar.js) （废弃了）[奇迹暖暖的日历](https://wiki.biligame.com/qjnn/%E6%97%A5%E5%8E%86) 
+[日历维护](https://wiki.biligame.com/pcr/MediaWiki:EventCalendar.js) （废弃了）[奇迹暖暖的日历](https://wiki.biligame.com/qjnn/%E6%97%A5%E5%8E%86) [活动归档](https://wiki.biligame.com/pcr/%E6%B4%BB%E5%8A%A8%E5%BD%92%E6%A1%A3) [活动](https://wiki.biligame.com/pcr/index.php?curid=2859) 
 
 https://wiki.biligame.com/pcr/Widget:Pagefill
 
@@ -16,7 +14,7 @@ https://wiki.biligame.com/pcr/Widget:Pagefill
 
 [人物关系图可互动版 - 奇迹暖暖WIKI_BWIKI_哔哩哔哩 (biligame.com)](https://wiki.biligame.com/qjnn/人物关系图可互动版) 什么时候抄了
 
-[战双模板:连载漫画](https://wiki.biligame.com/zspms/%E6%A8%A1%E6%9D%BF:%E8%BF%9E%E8%BD%BD%E6%BC%AB%E7%94%BB) [战双模板:懒加载图片](https://wiki.biligame.com/zspms/%E6%A8%A1%E6%9D%BF:%E6%87%92%E5%8A%A0%E8%BD%BD%E5%9B%BE%E7%89%87) 
+[战双模板:连载漫画](https://wiki.biligame.com/zspms/%E6%A8%A1%E6%9D%BF:%E8%BF%9E%E8%BD%BD%E6%BC%AB%E7%94%BB) [战双模板:懒加载图片](https://wiki.biligame.com/zspms/%E6%A8%A1%E6%9D%BF:%E6%87%92%E5%8A%A0%E8%BD%BD%E5%9B%BE%E7%89%87) 已放到common.js
 
 ## 鼠标图案
 

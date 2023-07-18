@@ -47,7 +47,8 @@ fix_name = {
     "炽热之剑": "高热剑",
     "希望之刃": "希望誓剑",
     "玛丽娜(夏日)": "玛丽娜(泳装)",
-    "塞里奥尔": "赛里奥尔"
+    "塞里奥尔": "塞里奥尔",
+    "奥莉维亚": "奥莉维尔",
 }
 
 wf = open(OUTPUT_FILE, "w+", encoding="utf-8")
@@ -88,7 +89,7 @@ def weapo_id_to_name(id):
         return ""
     return fix_name.get(cnname, cnname)
 
-start = 500
+start = 600
 for plate_idx in range(start, min(start+100, len(party))):
     plate = party[plate_idx]
     c = [""] * 6
@@ -118,7 +119,7 @@ for plate_idx in range(start, min(start+100, len(party))):
     # title
     title = ""
     if plate["description"]:
-        title += plate["description"]
+        title += plate["description"].lower()
     source = plate["source"].strip()
     if source != "待补充":
         if source.find("bilibili") != -1 or source.find("b23") != -1:

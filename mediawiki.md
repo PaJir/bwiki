@@ -34,7 +34,7 @@
 | `{{{xxx|}}}`         | 读取通过管道传入的名为xxx的数据的值                          |
 | `{{板块|xxx}}`       | bwiki的教程里有让大家用这个懒人包，这个其实是官方写好的一个模板，也可以改 |
 
-使用管道变量：`{{{name1|name2|name3...}}}`，多个变量之间使用管道符`|`进行分隔。管道变量相当于函数传参。
+使用管道变量：`{{{name1|name2|name3...}}}`，多个变量之间使用管道符`|`进行分隔。管道变量相当于函数传参<s>，没成功用过</s>。
 
 ### {{#xxx:}}
 
@@ -66,6 +66,8 @@ mediawiki.org 是MW的官方网站，里面有很棒的教程，但不要使用�
 
 [mediawiki.org/Extension:StringFunctions/zh](https://www.mediawiki.org/wiki/Extension:StringFunctions/zh) （explode分割字符串非常好用）
 
+[mediawiki.org/Extension:Labeled_Section_Transclusion/zh](https://www.mediawiki.org/wiki/Extension:Labeled_Section_Transclusion/zh) 
+
 [mediawiki.org/Manual:Interface/JavaScript](https://www.mediawiki.org/wiki/Manual:Interface/JavaScript) 
 
 [semantic-mediawiki.org](https://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki/zh-hans) 
@@ -86,7 +88,7 @@ mediawiki.org 是MW的官方网站，里面有很棒的教程，但不要使用�
 
 一个属性可以设置多个值，这个其实是非常香的，以目前测试来看，值还是有序的，以 pcr 为例，一个地图会掉落多种装备，现在的需求是要查询某种装备在哪些地图里掉落，如果不分开设置值的话，`#ask`使用模糊匹配，很有可能会因为字符串太长而没匹配上；值分开设置的话，就不会有这种匹配问题。
 
-**扩展** 在现阶段的 bwiki 表格，使用 jQuery 提供筛选功能，如果不使用数据查询那个`#wedge`调用`#ask`模糊匹配，那只能用 jQuery 的全字匹配，不过在设置`data-param`时，可以给一个`data-param`设置多个值，这就增大了匹配成功的机会，筛选项能够筛选的字段更多。
+**扩展** 在现阶段的 bwiki 表格，使用 jQuery 提供筛选功能，如果不使用数据查询那个`#wedget`调用`#ask`模糊匹配，那只能用 jQuery 的全字匹配，不过在设置`data-param`时，可以给一个`data-param`设置多个值，这就增大了匹配成功的机会，筛选项能够筛选的字段更多。
 
 在 pcr 的历史里，通过`#arraymap`来遍历设置属性……走弯路了啊，就是角色外号那个，写这篇文章的时候顺手改掉了。
 
@@ -101,6 +103,8 @@ mediawiki.org 是MW的官方网站，里面有很棒的教程，但不要使用�
  …
  }}
 ```
+
+如果有大量数据需要`#set`，则可以使用`#subobject`作为替代方案，使得大量数据保存在一个页面里，只是不能设置`[[分类]]`，例如[活动归档](https://wiki.biligame.com/pcr/%E6%B4%BB%E5%8A%A8%E5%BD%92%E6%A1%A3)。
 
 #### #switch
 
@@ -118,7 +122,7 @@ mediawiki.org 是MW的官方网站，里面有很棒的教程，但不要使用�
 
 #### #if
 
-
+类似的为`#ifeq`。
 
 ```javascript
 {{#if: 测试字串 
@@ -158,6 +162,8 @@ mediawiki.org 是MW的官方网站，里面有很棒的教程，但不要使用�
 [InputBox](https://www.mediawiki.org/wiki/Extension:InputBox/zh) 
 
 [导航栏](https://wiki.biligame.com/gt/MediaWiki:Sidebar) 
+
+[编辑通知](https://wiki.biligame.com/pcr/MediaWiki:Editnotice-0) 
 
 ## CSS
 

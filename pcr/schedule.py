@@ -16,6 +16,29 @@ def dateFormat(d):
 
 
 def schedule():
+    # 卡池
+    sql = """select gacha_id, gacha_name, description, start_time, end_time
+    from gacha_data
+    where gacha_id >= 30000 and gacha_id < 60000 and start_time > '2020/1/3 15:59:59'
+    order by exchange_id;"""
+    cursor.execute(sql)
+    all_data = cursor.fetchall()
+    with open(write_file, "w+", encoding="utf-8") as wf:
+        p = re.compile(r'「(.*?)」', re.S)
+        for data in all_data:
+            roles = re.findall(p, data[2])
+            wf.write("{{活动记录|开始时间=" + dateFormat(data[3]) + "|结束时间=" + dateFormat(data[4]) + "|活动=卡池|角色=")
+            wf.write('、'.join(roles))
+            wf.write("|详情=|备注=")
+            if data[1] == "附奖扭蛋" or data[2].find("复刻") != -1:
+                wf.write("复刻")
+            elif 40000 <= data[0] < 50000:
+                wf.write("3★概率2倍")
+            elif 50000 <= data[0]:
+                wf.write("fes")
+            wf.write("}}\n")
+    # 外传
+    # TODO
     # 庆典
     """id campaign_category value system_id icon_image 
     start_time end_time level_id shiori_group_id duplication_order
@@ -35,7 +58,7 @@ def schedule():
     order by id;"""
     cursor.execute(sql)
     all_data = cursor.fetchall()
-    with open(write_file, "w+", encoding="utf-8") as wf:
+    with open(write_file, "a+", encoding="utf-8") as wf:
         for data in all_data:
             if data[0] not in [31, 32, 34, 45, 37, 39, 91]:
                 continue
@@ -54,6 +77,16 @@ def schedule():
                 wf.write("高难关卡庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
             elif data[0] == 91:
                 wf.write("大师币庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+    # 露娜之塔
+    sql = """select tower_schedule_id, max_tower_area_id, start_time, end_time
+    from tower_schedule
+    order by tower_schedule_id;"""
+    cursor.execute(sql)
+    all_data = cursor.fetchall()
+    with open(write_file, "a+", encoding="utf-8") as wf:
+        for data in all_data:
+            wf.write("{{活动记录|开始时间=" + dateFormat(data[2]) + "|结束时间=" + dateFormat(data[3]) + "|活动=")
+            wf.write("露娜之塔|角色=|详情=" + "0EX|备注=}}\n")
     # 团队战
     sql = """select clan_battle_id, release_month, start_time, end_time
     from clan_battle_schedule
@@ -65,39 +98,6 @@ def schedule():
             id = clans[data[1] - 1]
             wf.write("{{活动记录|开始时间=" + dateFormat(data[2]) + "|结束时间=" + dateFormat(data[3]) + "|活动=")
             wf.write("团队战|角色=|详情=" + id + "|备注=}}\n")
-    # 露娜之塔
-    sql = """select tower_schedule_id, max_tower_area_id, start_time, end_time
-    from tower_schedule
-    order by tower_schedule_id;"""
-    cursor.execute(sql)
-    all_data = cursor.fetchall()
-    with open(write_file, "a+", encoding="utf-8") as wf:
-        for data in all_data:
-            wf.write("{{活动记录|开始时间=" + dateFormat(data[2]) + "|结束时间=" + dateFormat(data[3]) + "|活动=")
-            wf.write("露娜之塔|角色=|详情=" + "0EX|备注=}}\n")
-    # 卡池
-    sql = """select gacha_id, gacha_name, description, start_time, end_time
-    from gacha_data
-    where gacha_id >= 30000 and gacha_id < 60000 and start_time > '2020/1/3 15:59:59'
-    order by exchange_id;"""
-    cursor.execute(sql)
-    all_data = cursor.fetchall()
-    with open(write_file, "a+", encoding="utf-8") as wf:
-        p = re.compile(r'「(.*?)」', re.S)
-        for data in all_data:
-            roles = re.findall(p, data[2])
-            wf.write("{{活动记录|开始时间=" + dateFormat(data[3]) + "|结束时间=" + dateFormat(data[4]) + "|活动=卡池|角色=")
-            wf.write('、'.join(roles))
-            wf.write("|详情=|备注=")
-            if data[1] == "附奖扭蛋" or data[2].find("复刻") != -1:
-                wf.write("复刻")
-            elif 40000 <= data[0] < 50000:
-                wf.write("3★概率2倍")
-            elif 50000 <= data[0]:
-                wf.write("fes")
-            wf.write("}}\n")
-    # 外传
-    # TODO
 
 if __name__ == "__main__":
     schedule()
