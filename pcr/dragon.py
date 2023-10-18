@@ -7,10 +7,10 @@ cursor = conn.cursor()
 sql = "select * from srt_panel order by reading_id"
 
 cursor.execute(sql)
-
+wf = open("dragon.txt", "w+", encoding="utf-8")
 # [(1000100, '苹果', 1, 10001, '红色，酸酸甜甜的水果。', 'ing', 'o')]
 data = cursor.fetchall()
-type_map = {1: "普通读法", 2: "隐藏读法", 3: "公主连结读法"}
+type_map = {1: "普通", 2: "隐藏", 3: "公主连结"}
 st, ed = 0, 0
 for i, d in enumerate(data):
     if i == 0:
@@ -19,13 +19,23 @@ for i, d in enumerate(data):
         ed = i
         continue
     ed = i
-    print("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>")
+    wf.write("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>\n")
     for j in range(st, ed):
-        print("| " + data[j][1] + " || " + data[j][5] + " || " + data[j][6] + " || " + type_map[data[j][2]] + " || " + data[j][4])
-        print("|-")
+        wf.write("| " + data[j][1] + 
+              " || " + data[j][6] + 
+              " || " + data[j][7] + 
+              " || " + type_map[data[j][2]] + 
+              " || " + data[j][4] + 
+              " || " + str(data[j][5]) + "\n")
+        wf.write("|-\n")
     st = ed
 ed = ed + 1
-print("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>")
+wf.write("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>\n")
 for j in range(st, ed):
-    print("| " + data[j][1] + " || " + data[j][5] + " || " + data[j][6] + " || " + type_map[data[j][2]] + " || " + data[j][4])
-    print("|-")
+    wf.write("| " + data[j][1] + 
+          " || " + data[j][6] + 
+          " || " + data[j][7] + 
+          " || " + type_map[data[j][2]] + 
+          " || " + data[j][4] +
+          " || " + str(data[j][5]) + "\n")
+    wf.write("|-\n")

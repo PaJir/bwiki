@@ -160,7 +160,7 @@ wav_2_mp3("D:\Extra\pcr\mp3\\主页语音\\", "D:\Extra\pcr\mp3\\")
 """ 有问题的：
 vo_btl_100101_ub_100.m4a等等，还有好多
 部分文件没有上传，api：
-https://wiki.biligame.com/pcr/api.php?action=query&list=allimages&aifrom=Vo_btl&ailimit=5000&format=json
+https://wiki.biligame.com/pcr/api.php?action=query&list=allimages&aimime=audio/mpeg&aisort=timestamp&aidir=descending&aiprop=&prop=&aifrom=Vo_btl&ailimit=5000&format=json
 https://www.mediawiki.org/wiki/API:Allimages
 
 errorget:

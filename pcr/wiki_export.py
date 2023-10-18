@@ -4,10 +4,14 @@ from config import split_at
 
 fields = ["角色ID",
           "角色名",
+          "日文名",
           "翻译名",
+          "片假名",
+          "平假名",
           "角色介绍",
           "是否实装",
           "是否6星",
+          "是否专武",
           "kana",
           "外号",
           "CV",
@@ -113,6 +117,9 @@ fields = ["角色ID",
           "R23",
           "R24",
           "R25",
+          "R26",
+          "R27",
+          "R28",
           "1x属性",
           "1x属性强化",
           "2x属性",
@@ -219,7 +226,7 @@ def read_xml():
                 field = d[:eq_idx]
                 value = d[eq_idx+1:].replace("\n\n", "<br>").replace("\n", "")
                 field_map[field] = value
-            skill_rank(field_map)
+            # skill_rank(field_map)
             output = []
             for field in fields:
                 # output.append("|" + field + "=" + field_map.get(field, ""))

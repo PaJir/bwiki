@@ -7,11 +7,11 @@ in_path = "./unit"
 # 主线剧情 2
 # in_path = "./main"
 # 公会剧情 3
-# in_path = "./guild"
+in_path = "./guild"
 # 公会之家、竞技场、地下城等 4
-# in_path = "./others"
+in_path = "./others"
 # 活动剧情 5 信赖度 6
-# in_path = "./activity"
+in_path = "./activity"
 # 露娜塔 7
 # in_path = "./lunar"
 # 推图BOSS 9
@@ -34,13 +34,14 @@ def getText(rf):
 
 rep = {
     "101112": "101111", "101421": "101412", "101821": "101802",
+    "102212": "102211", "101512": "101511",
     "102312": "102311", "102321": "102303", "102821": "102803",
     "103112": "103111", "105213": "105211", "105612": "105611",
     "105812": "105811", "105913": "105911", "106012": "106011",
-    "106412": "106411", "106414": "106413", "106613": "106611", 
-    "106834": "106803",
+    "106412": "106411", "106414": "106413", "106532": "106501",
+    "106613": "106611", "106834": "106803", "104914": "104911",
     "110812": "110811", "111412": "111411", "112912": "112911",
-    "114612": "114611", "115512": "115511"
+    "114612": "114611", "115512": "115511", "116712": "116711"
 }
 
 
@@ -104,6 +105,8 @@ def transform(in_file, out_file, first=False, _title=""):
             wf.write("===SP升阶段2===\n")
         elif episode == "323":
             wf.write("===SP升阶段3===\n")
+    elif episode == "500":
+        wf.write("==角色生日特别剧情==\n")
 
     while line:
         # print(ttt, line)
@@ -138,8 +141,8 @@ def transform(in_file, out_file, first=False, _title=""):
                     pass
                 else:
                     wf.write("第" + episode[2] + "话 ")
-            else:
-                wf.write("第" + episode[2] + "话 ")
+            elif not black_in.startswith("幕间"):
+                wf.write("第" + str(int(episode[1:3])) + "话 ")
             wf.write(black_in + "==\n")
             if outline not in ["", " ", "\t"]:
                 wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + outline + "\n}" + "}\n")
@@ -168,10 +171,10 @@ def transform(in_file, out_file, first=False, _title=""):
             bgm_cur = 1
             while line == "bgm":
                 text = getText(rf)
-                getNext(rf)
                 bg = getNext(rf)
                 bgms[bg] = text
                 bgms_count += 1
+                getNext(rf)
                 line = getNext(rf)
                 while line != "":
                     line = getNext(rf)
