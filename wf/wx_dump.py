@@ -49,6 +49,7 @@ fix_name = {
     "玛丽娜(夏日)": "玛丽娜(泳装)",
     "塞里奥尔": "塞里奥尔",
     "奥莉维亚": "奥莉维尔",
+    "宇宙蓝色法杖": "宇宙蓝色魔杖"
 }
 
 wf = open(OUTPUT_FILE, "w+", encoding="utf-8")
@@ -89,7 +90,7 @@ def weapo_id_to_name(id):
         return ""
     return fix_name.get(cnname, cnname)
 
-start = 600
+start = 400
 for plate_idx in range(start, min(start+100, len(party))):
     plate = party[plate_idx]
     c = [""] * 6

@@ -1,7 +1,5 @@
 # 装备数据
 import sqlite3
-import io
-import openpyxl
 from config import db_name, db_name_jp
 
 conn = sqlite3.connect(db_name)
@@ -48,16 +46,29 @@ LIMIT 1"""
 #初始地图
 def lowest_map(id):
     id = str(id)
-    wb = openpyxl.load_workbook("./read_db_equipment.xlsx")
-    sheetname = wb.sheetnames[0]
-    sheet = wb[sheetname]
-    rows = sheet.max_row
-    for row in range(2, rows + 1):
-        m = sheet.cell(row, 1).value
-        c = sheet.cell(row, 3).value
-        if id[2:] in c:
-            return m.split("-")[0]
-    return "12345"
+    sql_reward_id = """(select drop_reward_id
+from enemy_reward_data r where 
+substr(r.reward_id_1, 3, 4) == \"""" + id[2:] + """\" or
+substr(r.reward_id_2, 3, 4) == \"""" + id[2:] + """\" or
+substr(r.reward_id_3, 3, 4) == \"""" + id[2:] + """\" or
+substr(r.reward_id_4, 3, 4) == \"""" + id[2:] + """\" or
+substr(r.reward_id_5, 3, 4) == \"""" + id[2:] + """\")"""
+    wave_group_id = """(select wave_group_id
+from wave_group_data w where 
+drop_reward_id_1 in """ + sql_reward_id + """ or
+drop_reward_id_2 in """ + sql_reward_id + """ or
+drop_reward_id_3 in """ + sql_reward_id + """)"""
+    sql_map = """
+select min(area_id)
+from quest_data where
+wave_group_id_1 in """ + wave_group_id + """ or
+wave_group_id_2 in """ + wave_group_id + """ or
+wave_group_id_3 in """ + wave_group_id
+    cursor_jp.execute(sql_map)
+    all_data = cursor_jp.fetchone()
+    assert all_data != None
+    return str(all_data[0])[3:]
+
 def equipment_craft(cur):
     f = open("equip_data_craft_rate.txt", "w", encoding="UTF-8")
     # 7 + 15 + 15 + 21

@@ -62,7 +62,7 @@ def rank(id):
         id = "1076"
     r = []
     # print(id)
-    for i in range(1, 29):
+    for i in range(1, 31):
         sql = "select equip_slot_1, equip_slot_2, equip_slot_3, equip_slot_4, equip_slot_5, equip_slot_6 from unit_promotion" + \
             " where unit_id = " + id + "01 and promotion_level = " + str(i)
         cursor_jp.execute(sql)
@@ -228,7 +228,7 @@ def role_main(data, cur):
     f.write(unit_skill_data(id))
     # 起手顺序 行动顺序 
     f.write(attack_pattern(id, cur))
-    # R1-R28
+    # R1-R30
     f.write(rank(id))
     # R1-R24属性
     # f.write(unit_promotion_status(id))

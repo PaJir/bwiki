@@ -172,6 +172,8 @@ def get_equip_craft(img_list=[], format="png", prefix=""):
     for equip in img_list:
         get_png(redive_equip, [equip, equip+10000, equip+20000])
 
+def get_library(img_list, format="png", prefix="", web_format=".png"):
+    get_png("https://pcredivewiki.tw/static/images/equipment/icon_equipment_", img_list, "png", "", ".png")
 
 if __name__ == "__main__":
     # for name in equip_list:
