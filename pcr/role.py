@@ -5,7 +5,7 @@
 import sqlite3
 import io
 import re
-from config import db_name, db_name_jp, split_at
+from config import db_name, db_name_jp, split_at, status_map
 from skill import attackPattern
 
 write_file = "role.txt"
@@ -19,23 +19,6 @@ f = open(write_file, "w", encoding="UTF-8")
 
 bad_unit = [110201] #, 106701]
 p1 = re.compile(r'[（](.*?)[）]', re.S) # 匹配括号内的内容
-status_map = {
-    1: "生命值", 
-    2: "物理攻击力", 
-    4: "魔法攻击力", 
-    3: "物理防御力", 
-    5: "魔法防御力", 
-    6: "物理暴击", 
-    7: "魔法暴击", 
-    10: "生命自动回复", 
-    11: "技能值自动回复", 
-    8: "回避", 
-    9: "生命值吸收", 
-    15: "回复量上升", 
-    14: "技能值上升", 
-    140: "技能值消耗降低", 
-    17: "命中"
-}
 # CN/JP
 def audio(id, cur):
     id = str(id)
@@ -167,6 +150,7 @@ def unit_skill_data(id):
     # 501 EX技能    EX技能图    EX技能描述   EX技能效果
     # 511 EX技能plus xxxxxxxx  EX技能plus描述 EX技能plus效果
     # 012 xxxxx     xxxxxxxx   专属技能描述   专属技能效果
+    # 二专技能描述 二专技能效果 待定
     for skill_type in skill_id:
         skill = skill_map.get(skill_type, [""] * 11)
         if skill_type == "011" or skill_type == "511":
@@ -175,7 +159,7 @@ def unit_skill_data(id):
             ret += skill[9] + split_at*2
         else:
             ret += skill[1] + split_at + ("Icon_skill_" if str(skill[0]) != "" else "")  + str(skill[10]) + split_at + skill[9] + split_at*2
-    return ret
+    return ret + split_at*2
 
 # CN/JP
 def attack_pattern(id, cur):
@@ -203,8 +187,8 @@ def role_main(data, cur):
     atk_type = "物理" if data[18] == 1 else "魔法"
     # 生日
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
-    # 页面名 角色ID 角色名/手动 日文名/手动 翻译名 片假名/手动 平假名/手动 角色介绍 是否实装/手动 是否专武/手动 是否6星/手动
-    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>")+split_at*4) 
+    # 页面名 角色ID 角色名/手动 日文名/手动 翻译名 片假名/手动 平假名/手动 角色介绍 是否实装/手动 是否专武/手动 是否6星/手动 是否二专/手动
+    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>")+split_at*5) 
     # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动）
     f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+data[8]+split_at*2)
     # 1星立绘语音 3星立绘语音 生日语音 UB语音 六星UB语音
@@ -224,7 +208,7 @@ def role_main(data, cur):
     # 技能1 技能1图 技能1描述 技能1效果 技能2 技能2图 技能2效果 技能2描述 
     # 特殊技能1 特殊技能1图 特殊技能1描述 特殊技能1效果 特殊技能2 特殊技能2图 特殊技能2描述 特殊技能2效果 特殊技能3 特殊技能3图 特殊技能3描述 特殊技能3效果 
     # EX技能 EX技能图 EX技能描述 EX技能效果 EX技能plus EX技能plus描述 EX技能plus效果 
-    # 专属技能描述 专属技能效果 
+    # 专属技能描述 专属技能效果 二专技能描述 二专技能效果
     f.write(unit_skill_data(id))
     # 起手顺序 行动顺序 
     f.write(attack_pattern(id, cur))
@@ -236,7 +220,7 @@ def role_main(data, cur):
     f.write(rarity(id)[:-1])
     f.write("\n")
 
-def role():
+def role(filter=[]):
     sql2 = """
         select d.comment _0, d.unit_id _1, b.unit_name _2, d.unit_name _3, 
         d.kana _4, p.voice _5, d.rarity _6, is_limited _7, p.guild _8, 
@@ -252,18 +236,19 @@ def role():
         from unit_data d join unit_profile p on d.unit_id = p.unit_id
         where d.unit_id < 190801 
         order by d.unit_id asc"""
-
+    ret = []
     cursor.execute(sql)
     all_data = cursor.fetchall()
     cursor_jp.execute(sql)
     all_data_jp = cursor_jp.fetchall()
     print(len(all_data), len(all_data_jp))
     for data in all_data:
-        if data[1] in bad_unit:
+        if data[1] in bad_unit or data[1] in filter:
             continue
+        # ret.append(data[1])
         role_main(data, cursor)
     for data_jp in all_data_jp:
-        if data_jp[1] in bad_unit:
+        if data_jp[1] in bad_unit or data_jp[1] in filter:
             continue
         in_cn = False
         for data in all_data:
@@ -272,8 +257,9 @@ def role():
                 break
         # if in_cn:
         #     continue
-        print(data_jp[1])
+        ret.append(data_jp[1])
         role_main(data_jp, cursor_jp)
+    return ret
 
 """备忘
 unit_attack_pattern: 技能循环

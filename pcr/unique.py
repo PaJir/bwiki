@@ -16,7 +16,8 @@ def write_same(data):
         s += str(data[i]).replace("\\\\n","<br/>").replace("\\n","<br/>") + split_at
     return s[:-1] + "\n"
 
-def equipment_craft():
+def equipment_craft(filter=[]):
+    ret = []
     f = open("unique.txt", "w", encoding="UTF-8")
     # 7 + 15 + 15 + 21
     sql_main_cn = """
@@ -35,6 +36,9 @@ order by d.equipment_id"""
     all_data = cursor.fetchall()
     # all_data = []
     for data in all_data:
+        if data[0] in filter:
+            continue
+        ret.append(data[0])
         f.write(write_same(data))
 
     cursor_jp.execute(sql_main)
@@ -47,12 +51,17 @@ order by d.equipment_id"""
                 break
         if in_cn:
             continue
+        if data[0] in filter:
+            continue
+        ret.append(data[0])
         f.write(write_same(data))
     f.close()
+    return ret
 
-equipment_craft()
-conn.close()
-conn_jp.close()
+if __name__ == "__main__":
+    equipment_craft()
+    conn.close()
+    conn_jp.close()
 """
 select equipment_id, equipment_name, description, 
 """

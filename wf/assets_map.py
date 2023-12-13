@@ -3,11 +3,11 @@ import json
 import en2cn
 import shutil
 
-# ROOT_PATH = "D:\\wf_cn\\output\\orderedmap"
-ROOT_PATH = "D:\\github\\wf-assets\\orderedmap"
-ASSETS_PATH = "D:\\wf_cn\\output\\assets"
-ASSETS_PATH2 = "D:\\wf\\output\\assets"
-ASSETS_PATH3 = "D:\\wf\\assets"
+ROOT_PATH = "E:\\wf_jp\\output\\orderedmap"
+# ROOT_PATH = "C:\\github\\wf-assets\\orderedmap"
+ASSETS_PATH = "E:\\wf_cn\\output\\assets"
+ASSETS_PATH2 = "E:\\wf\\output\\assets"
+ASSETS_PATH3 = "E:\\wf\\assets"
 
 wf = open("assets_map.txt", "w+", encoding="utf-8")
 
@@ -31,6 +31,7 @@ characters_text = read_json_file(os.path.join(ROOT_PATH, "character\\character_t
 characters_status = read_json_file(os.path.join(ROOT_PATH, "character\\character_status.json"))
 # name - name_cn, color
 story_character = read_json_file(os.path.join(ROOT_PATH, "story\\story_character.json"))
+gacha = read_json_file(os.path.join(ROOT_PATH, "gacha\\gacha.json"))
 
 def search_equip_prob():
     for score_reward in score_rewards:
@@ -49,7 +50,7 @@ def search_equip_prob():
                         continue
                     equipment_name = equipment[0]
                     if rare_score_reward_name.startswith("boss_battle"):
-                        wf.write(rare_score_reward_name, equipment_name, rare_score_reward_prob)
+                        wf.write("%s\t%s\t%s\n" % (rare_score_reward_name, equipment_name, rare_score_reward_prob))
                         # pass
                 elif rare_score_reward_name.find("character") != -1:
                     character_id = rare_score_reward[rare_score_reward_subid][2]
@@ -58,7 +59,7 @@ def search_equip_prob():
                         continue
                     character_name = character[0]
                     character_name_cn = en2cn.en2cn(character_name)
-                    wf.write(rare_score_reward_name, character_name, character_name_cn, rare_score_reward_prob)
+                    wf.write("%s\t%s\t%s\t%s\n" % (rare_score_reward_name, character_name, character_name_cn, rare_score_reward_prob))
 
 
 def character_hp_atk():
@@ -147,28 +148,39 @@ def character_info():
             cv = ""
         character = characters.get(character_id)
         if character is not None:
+            # character = character[0]
             name_en = character[0]
-            name_cn = en2cn.en2cn(name_en)
-            if name_cn == "":
-                print(name_en)
+            name_cn_tmp = en2cn.en2cn(name_en)
+            if name_cn_tmp == "":
+                print(name_en, name_cn)
+            else:
+                name_cn = name_cn_tmp
             star = character[2]
             attr = en2cn.en2attr(character[3])
             race = en2cn.en2race(character[4])
             _type = en2cn.en2type(character[6])
             gender = en2cn.en2gender(character[7])
-            stance = en2cn.en2stance(character[18])
+            stance = en2cn.en2stance(character[26])
         status = characters_status.get(character_id)
         hp_1, atk_1 = "", ""
         if status is not None:
             hp_1 = status["1"][0]
             atk_1 = status["1"][1]
         storys = []
+        wf_story = open(os.path.join("story", "角色", name_cn+".txt"), "w+", encoding="utf-8")
+        wf_story.write("{{DISPLAYTITLE:%s剧情}}__TOC__\n" % name_cn)
         for quest_suffix in ["01", "02", "03"]:
             quest = character_quests.get(character_id + quest_suffix)
             if quest is not None:
-                storys.append("《%s》<br>%s" % (quest[3], quest[102].replace("\n", "<br>").replace("\\n", "<br>")))
+                # quest = quest[0]
+                storys.append("《%s》<br>%s" % (quest[3], quest[106].replace("\n", "<br>").replace("\\n", "<br>")))
+                wf_story.write("==%s==\n" % (quest[3]))
+                wf_story.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + quest[106] + "\n}}\n")
+                scenario = read_json_file(os.path.join(ROOT_PATH, quest[109] + ".json"))
+                write_scenario(scenario, wf_story)
             else:
                 storys.append("")
+        wf_story.close()
         voice_home = []
         voice_join = ""
         voice_evolution = ""
@@ -187,6 +199,7 @@ def character_info():
                     ]
         speech = character_speechs.get(character_id)
         if speech is not None:
+            # speech = speech[0]
             for i in range(3, len(speech), 5):
                 voice_path = os.path.join(ASSETS_PATH, "character", name_en, "voice", speech[i+1]+".mp3")
                 voice_path2 = os.path.join(ASSETS_PATH2, "character", name_en, "voice", speech[i+1]+".mp3")
@@ -222,6 +235,7 @@ def character_info():
                   cv, intro, hp_1, atk_1, banner, 
                   skill_name, skill_desp, leader_name, "\t".join(storys), "￥".join(voice_home), 
                   voice_join, voice_evolution))
+        # break
     return
 
 
@@ -266,35 +280,40 @@ def story_main():
                 if not quest[2].endswith("story"):
                     continue
                 title = quest[1]
-                intro = quest[100]
-                file_path = quest[103]
+                intro = quest[104]
+                file_path = quest[107]
                 wf.write("==%s-%s-%s %s==\n" % (chapter_id, main_id, quest_id, title))
                 wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + intro + "\n}}\n")
                 scenario = read_json_file(os.path.join(ROOT_PATH, file_path + ".json"))
-                for _s in scenario.values():
-                    for s in _s.values():
-                        if s[5] == "":
-                            continue
-                        name = story_character[s[4]][0]
-                        # color = story_character[s[4]][3]
-                        chara_ui = story_character[s[4]][4]
-                        if chara_ui == "":
-                            img_name = ""
-                        else:
-                            img_name_ = chara_ui.split("/")[1]
-                            if chara_ui.find("unknown") != -1:
-                                img_name_ += "_unknown"
-                            img_name = en2cn.en2cn(img_name_)
-                            if img_name == "":
-                                print(img_name_)
-                                img_name = ""
-                        wf.write("{" + "{对话|%s|%s|%s}}\n" % (img_name, name, s[5].replace("\n", "<br>").replace("\\n", "<br>")))
+                write_scenario(scenario, wf)
 
+def write_scenario(scenario, wf):
+    for _s in scenario.values():
+        for s in _s.values():
+            if s[5] == "":
+                continue
+            name = story_character[s[4]][0]
+            # color = story_character[s[4]][3]
+            chara_ui = story_character[s[4]][4]
+            if chara_ui == "":
+                img_name = ""
+            else:
+                img_name_ = chara_ui.split("/")[1]
+                if chara_ui.find("unknown") != -1:
+                    img_name_ += "_unknown"
+                img_name = en2cn.en2cn(img_name_)
+                if img_name == "":
+                    print(img_name_)
+                    img_name = ""
+            wf.write("{" + "{对话|%s|%s|%s}}\n" % (img_name, name, s[5].replace("\n", "<br>").replace("\\n", "<br>").replace("~~~", "<nowiki>~~~</nowiki>")))
 
 def equip_info():
     equipment_status = read_json_file(os.path.join(ROOT_PATH, "item\\equipment_status.json"))
+    elements = {"0": "火", "1": "水", "2": "雷", "3": "风", "4": "光", "5": "暗"}
     for equip_id in equipments:
+        equip_en_name = equipments[equip_id][0]
         equip_name = equipments[equip_id][1]
+        equip_element = elements.get(items[equip_id][11], "全")
         equip_info = equipments[equip_id][7]
         equip_story = equipments[equip_id][5]
         hp_1 = equipment_status[equip_id]["1"][0]
@@ -307,14 +326,18 @@ def equip_info():
         else:
             hp_5 = equipment_status[equip_id]["5"][0]
             atk_5 = equipment_status[equip_id]["5"][1]
-        wf.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (equip_id, equip_name, equip_info, equip_story, hp_1, hp_5, atk_1, atk_5))
+        wf.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (equip_id, equip_en_name, equip_element, equip_name, equip_info, equip_story, hp_1, hp_5, atk_1, atk_5))
 
+def gacha_info():
+    for g in gacha.values():
+        wf.write("%s\t%s\t%s\t%s\n" % (g[1], g[0], g[29], g[30]))
 
 if __name__ == "__main__":
     # search_equip_prob()
     # character_hp_atk()
     # mana_node_need()
-    character_info()
+    # character_info()
     # pedia_help()
     # story_main()
     # equip_info()
+    gacha_info()

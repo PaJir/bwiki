@@ -68,6 +68,23 @@ def zoomIn(old_image, new_image, pow, left, right, top, down):
     im = Image.fromarray(outData)
     im.save(new_image)
 
+def zoomInMargin(old_image, new_image, pow, big_width, big_height):
+    # if not os.path.exists(old_image):
+    #     return
+    inData = getPixelColor(old_image)
+    height = len(inData)
+    width = len(inData[0])
+    outData = np.zeros([big_height, big_width, 4])
+    for i in range(height*pow):
+        for j in range(width*pow):
+            a = i//pow
+            b = j//pow
+            x = i + (big_height-height*pow)
+            y = j + (big_width-width*pow)//2
+            outData[x][y] = [inData[a][b][0], inData[a][b][1], inData[a][b][2], inData[a][b][3]] 
+    outData = np.uint8(outData)
+    im = Image.fromarray(outData)
+    im.save(new_image)
 
 def create_gif(skill_path, role_name):
     print("start " + skill_path)

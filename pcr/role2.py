@@ -5,7 +5,7 @@
 import sqlite3
 import io
 import re
-from config import db_name, db_name_jp
+from config import db_name, db_name_jp, status_map
 from skill import attackPattern
 
 write_file = "role2.txt"
@@ -19,23 +19,6 @@ f = open(write_file, "w", encoding="UTF-8")
 
 bad_unit = [110201] #, 106701]
 p1 = re.compile(r'[（](.*?)[）]', re.S) # 匹配括号内的内容
-status_map = {
-    1: "生命值", 
-    2: "物理攻击力", 
-    4: "魔法攻击力", 
-    3: "物理防御力", 
-    5: "魔法防御力", 
-    6: "物理暴击", 
-    7: "魔法暴击", 
-    10: "生命自动回复", 
-    11: "技能值自动回复", 
-    8: "回避", 
-    9: "生命值吸收", 
-    15: "回复量上升", 
-    14: "技能值上升", 
-    140: "技能值消耗降低", 
-    17: "命中"
-}
 # JP RANK装备
 def rank(id):
     r = []

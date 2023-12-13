@@ -1,29 +1,26 @@
 import os
 from PIL import Image
-
+from config import assert_path
 
 def comic(filepath, savepath):
-    """
-    filepath: D:\Extra\pcr\comic\\角色漫画\\
-    savepath: D:\Extra\pcr\comic\\comic1\\
-    """
-    # vo_cmn_100111
     files = os.listdir(filepath)
     for file in files:
         filename = os.path.join(filepath, file)
         # savename = os.path.join(savepath, "comic_" + file[8:14] + ".png")
         savename = os.path.join(savepath, file)
+        if file.startswith("comic"):
+            savename = os.path.join(savepath, "comic_"+file[8:14]+".png")
         if os.path.exists(savename):
             continue
         im = Image.open(filename)
-        out = im.resize((240,135), Image.ANTIALIAS)
+        if file.startswith("comic"):
+            out = im.resize((512, 400), Image.ANTIALIAS)
+        else:
+            out = im.resize((240,135), Image.ANTIALIAS)
         out.save(savename)
 
 
-def story_still():
-    filepath = "D:\Extra\pcr\\row\\Texture2D_story"
-    savepath = "D:\Extra\pcr\\row\\Texture2D_storystill"
-
+def story_still(filepath, savepath):
     files = os.listdir(filepath)
     for file in files:
         if not file.startswith("still"):
@@ -45,6 +42,8 @@ def story_still():
         out = im.resize(out_size, Image.ANTIALIAS)
         out.save(savename)
 
-# comic("D:\Extra\pcr\comic\\角色漫画\\", "D:\Extra\pcr\comic\\comic1\\")
-# comic("D:\Extra\pcr\\row\\Texture2D_storytop\\", "D:\Extra\pcr\\row\\Texture2D_storytop2\\")
-story_still()
+# comic(os.path.join(assert_path, "comic\\角色漫画"), os.path.join(assert_path, "comic\\comic1"))
+comic(os.path.join(assert_path, "row\\story_thumb"), os.path.join(assert_path, "row\\story_thumb_output"))
+# story_still(os.path.join(assert_path, "row\\story_cg"), os.path.join(assert_path, "row\\story_cg_output"))
+
+# https://wiki.biligame.com/pcr/api.php?action=query&format=json&list=allimages&aisort=name&aifrom=Comic_100000&aito=Comic_999999&aimime=image%2Fpng&ailimit=500

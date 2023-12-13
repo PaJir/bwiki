@@ -10,7 +10,7 @@ cursor = conn.cursor()
 
 
 def search_equipment(questid, quest_id_nozero, mapid_nozero, mapid):
-    
+    ret_unit = ""
     sql_main = """select e.equipment_id id, r.odds_1 odds
 from enemy_reward_data r join equipment_data e on r.reward_id_1 = e.equipment_id
 where r.drop_reward_id in (""" + \
@@ -90,11 +90,13 @@ where r.drop_reward_id in (""" + \
 
     if len(unit_data) > 0:
         if(str(unit_data[0][0])[1]=="1"):
-            print_str += str(unit_data[0][0])[2:] + " " + str(unit_data[0][1]) + "% "
+            ret_unit = str(unit_data[0][0])[2:]
+            print_str += ret_unit + " " + str(unit_data[0][1]) + "% "
         else:
             print_str += "  "
         if(str(unit_data[0][0])[1]=="2"):
-            print_str += str(unit_data[0][0])[2:] + " " + str(unit_data[0][1]) + "% "
+            ret_unit = str(unit_data[0][0])[2:]
+            print_str += ret_unit + " " + str(unit_data[0][1]) + "% "
         else:
             print_str += "  "
     else:
@@ -104,20 +106,33 @@ where r.drop_reward_id in (""" + \
     print_str += areaid + mapid + questid
     # print("}}")
     print(print_str)
+    return ret_unit
 
-mapid = [str(a) for a in range(50, 60)]
-questid_max = [a for a in range(1, 20)]
-for m in mapid:
-    for i in questid_max:
-        tmp = str(i)
-        
-        if i < 10:
-            tmp = "0" + tmp
-        mapid_zero = ("0" + m) if len(m) == 1 else m
-        # nozero, withzero, nozero, withzero
-        search_equipment(tmp, str(i), m, mapid_zero)
 
-conn.close()
+def map_equipment(map_st, quest_st, map_ed, quest_ed):
+    # range: (map_st.quest_st, map_ed.quest_ed]
+    ret_units = []
+    mapid = [str(a) for a in range(map_st, map_ed+1)]
+    questid_max = [a for a in range(1, quest_ed+1)]
+    for m in mapid:
+        for i in questid_max:
+            if m == mapid[0] and i <= quest_st:
+                continue
+            tmp = str(i)
+            
+            if i < 10:
+                tmp = "0" + tmp
+            mapid_zero = ("0" + m) if len(m) == 1 else m
+            # nozero, withzero, nozero, withzero
+            ret_unit = search_equipment(tmp, str(i), m, mapid_zero)
+            if ret_unit != "":
+                ret_units.append(ret_unit)
+    return ret_units
+
+
+if __name__ == "__main__":
+    map_equipment(66, 0, 68, 20)
+    conn.close()
 
 """
 quest_area_data: area_id, area_name

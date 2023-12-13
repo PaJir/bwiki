@@ -2,12 +2,9 @@
 import sqlite3
 import io
 import re
-from config import db_name, db_name_jp
 
 write_file = "schedule.txt"
 
-conn = sqlite3.connect(db_name)
-cursor = conn.cursor()
 clans = ["水瓶座", "双鱼座", "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "魔羯座"]
 
 
@@ -15,7 +12,9 @@ def dateFormat(d):
     return d.replace("/", "-")[:-3].replace(" 5:", " 05:").replace(" 4:", " 04:").replace("  ", " ")
 
 
-def schedule():
+def schedule(db_name):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
     # 卡池
     sql = """select gacha_id, gacha_name, description, start_time, end_time
     from gacha_data
@@ -38,7 +37,18 @@ def schedule():
                 wf.write("fes")
             wf.write("}}\n")
     # 外传
-    # TODO
+    sql = """select hs.event_id, hs.start_time, hs.end_time, ud.unit_name, ud2.unit_name
+    from hatsune_schedule hs, hatsune_item ht, unit_data ud, unit_data ud2
+    where hs.event_id = ht.event_id and 
+    substr(ht.unit_material_id_1, 2, 4)=substr(ud.unit_id, 1, 4) and 
+    substr(ht.unit_material_id_2, 2, 4)=substr(ud2.unit_id, 1, 4)
+    order by hs.start_time;"""
+    cursor.execute(sql)
+    all_data = cursor.fetchall()
+    with open(write_file, "a+", encoding="utf-8") as wf:
+        for data in all_data:
+            wf.write("{{活动记录|开始时间=" + dateFormat(data[1]) + "|结束时间=" + dateFormat(data[2]) + "|活动=")
+            wf.write("外传|角色=" + data[3] + "、" + data[4] + "|详情=" + str(data[0])[3:] + "|备注=}}\n")
     # 庆典
     """id campaign_category value system_id icon_image 
     start_time end_time level_id shiori_group_id duplication_order
@@ -98,6 +108,5 @@ def schedule():
             id = clans[data[1] - 1]
             wf.write("{{活动记录|开始时间=" + dateFormat(data[2]) + "|结束时间=" + dateFormat(data[3]) + "|活动=")
             wf.write("团队战|角色=|详情=" + id + "|备注=}}\n")
-
-if __name__ == "__main__":
-    schedule()
+    # 兰德索尔杯
+    # chara_fortune_schedule

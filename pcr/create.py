@@ -16,19 +16,21 @@ def create(db_name, data_path):
         if not sql_file.endswith('sql'):
             continue
         sql_path_name = os.path.join(data_path, sql_file)
-        print(sql_path_name)
+        # print(sql_path_name)
         with open(sql_path_name, 'r', encoding='utf-8') as rf:
             lines = rf.readlines()
             try:
                 cursor.execute(lines[0])
                 conn.commit()
             except:
-                print(lines[0])
+                # print(lines[0])
+                pass
             for line in lines[1:]:
                 try:
                     cursor.execute(line)
                 except:
-                    print(line)
+                    # print(line)
+                    pass
             conn.commit()
     cursor.close()
     conn.close()

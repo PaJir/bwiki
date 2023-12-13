@@ -21,13 +21,16 @@ new_craft = ["太阳剑", "公主短剑", "狮子王的护臂", "天使弓", "�
     "悲叹河之爪", "盖亚之斧", "亚特兰蒂斯之杖", "雷霆之杖", "愤怒女王的礼裙", "煌金王铠", "魔导王长袍", "鬼焰斗衣", 
     "血红宝石高跟鞋", "皇家守卫帽"]
 
-def write_same(data):
+def write_same(data, min_map):
     s = ""
+    min_map_ = lowest_map(data[0])
+    if int(min_map_) < min_map:
+        return s
     s += str(data[0]) + " "
     for i in range(37):
         s += str(data[i]).replace("\\\\n","<br/>").replace("\\n","<br/>").replace(" ", "") + " "
     s += str(lowest_rank(data[0])) + " "
-    s += str(lowest_map(data[0])) + " "
+    s += lowest_map(data[0]) + " "
     # s += " "
     return s
 # 初始RANK
@@ -66,10 +69,11 @@ wave_group_id_2 in """ + wave_group_id + """ or
 wave_group_id_3 in """ + wave_group_id
     cursor_jp.execute(sql_map)
     all_data = cursor_jp.fetchone()
-    assert all_data != None
+    if all_data[0] is None:
+        return "0000" # 魔法师眼镜
     return str(all_data[0])[3:]
 
-def equipment_craft(cur):
+def equipment_craft(min_map=1, cur=cursor_jp):
     f = open("equip_data_craft_rate.txt", "w", encoding="UTF-8")
     # 7 + 15 + 15 + 21
     sql_main = """
@@ -88,8 +92,13 @@ r.hp, r.atk, r.magic_str, r.def, r.magic_def, r.physical_critical, r.magic_criti
 from equipment_data d join equipment_enhance_rate r on d.equipment_id = r.equipment_id"""
     cur.execute(sql_main2)
     low_data = cur.fetchall()
+    ret = []
     for data in all_data:
-        f.write(write_same(data))
+        same_str = write_same(data, min_map)
+        if same_str == "":
+            continue
+        ret.append(data[0])
+        f.write(same_str)
         # 合成价格
         f.write(str(data[37]) + " ")
         # 合成材料
@@ -112,10 +121,16 @@ from equipment_data d join equipment_enhance_rate r on d.equipment_id = r.equipm
                 break
         if not is_low:
             continue
-        f.write(write_same(data))
+        same_str = write_same(data, min_map)
+        if same_str == "":
+            continue
+        ret.append(data[0])
+        f.write(same_str)
         f.write("\n")
     f.close()
+    return ret
 
-equipment_craft(cursor_jp)
-conn.close()
-conn_jp.close()
+if __name__ == "__main__":
+    equipment_craft(67, cursor_jp)
+    conn.close()
+    conn_jp.close()

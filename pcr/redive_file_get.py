@@ -178,14 +178,7 @@ def get_library(img_list, format="png", prefix="", web_format=".png"):
 if __name__ == "__main__":
     # for name in equip_list:
     #     webp2png(name)
-    ids = ["1275"]
-    # for id in ids:
-        # get_new_imgs(id)
-    # get_6x_icon_chr("1064")
-    # get_spine_q2(["106401"])
-    ids = [130772, 130792, 130802] # [131641, 132101, 132111, 132121]
-    # get_equip_craft(ids)
+    # get_spine_q2(["126001"])
 
-    # get_png(redive_item_icon, ["32061"], "png", "Icon_item_")
-    get_png(redive_unit_story, ["507600401", "507600501", "507600601", "507600602"], "jpg")
+    get_png(redive_unit_story, ["508000101", "508000301", "508000601", "508000701"], "jpg")
     # get_png(redive_unit_icon, ["106415", "191312"], "png", "Icon_unit_")
