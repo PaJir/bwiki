@@ -51,11 +51,11 @@ def lowest_map(id):
     id = str(id)
     sql_reward_id = """(select drop_reward_id
 from enemy_reward_data r where 
-substr(r.reward_id_1, 3, 4) == \"""" + id[2:] + """\" or
-substr(r.reward_id_2, 3, 4) == \"""" + id[2:] + """\" or
-substr(r.reward_id_3, 3, 4) == \"""" + id[2:] + """\" or
-substr(r.reward_id_4, 3, 4) == \"""" + id[2:] + """\" or
-substr(r.reward_id_5, 3, 4) == \"""" + id[2:] + """\")"""
+substr(r.reward_id_1, 3) == \"""" + id[2:] + """\" or
+substr(r.reward_id_2, 3) == \"""" + id[2:] + """\" or
+substr(r.reward_id_3, 3) == \"""" + id[2:] + """\" or
+substr(r.reward_id_4, 3) == \"""" + id[2:] + """\" or
+substr(r.reward_id_5, 3) == \"""" + id[2:] + """\")"""
     wave_group_id = """(select wave_group_id
 from wave_group_data w where 
 drop_reward_id_1 in """ + sql_reward_id + """ or

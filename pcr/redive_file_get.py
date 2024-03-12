@@ -170,7 +170,10 @@ def get_6x_icon_chr(id : str):
 def get_equip_craft(img_list=[], format="png", prefix=""):
     """获取装备及其材料"""
     for equip in img_list:
-        get_png(redive_equip, [equip, equip+10000, equip+20000])
+        if equip < 10000000:
+            get_png(redive_equip, [equip, equip+10000, equip+20000])
+        else:
+            get_png(redive_equip, [equip, equip+1000000, equip+2000000])
 
 def get_library(img_list, format="png", prefix="", web_format=".png"):
     get_png("https://pcredivewiki.tw/static/images/equipment/icon_equipment_", img_list, "png", "", ".png")
