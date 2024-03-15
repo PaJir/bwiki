@@ -7,20 +7,22 @@ from PIL import Image
 from config import assert_path
 
 # https://redive.estertion.win/sound/unit_battle_voice/103601/vo_btl_103601_applaud.m4a
-redive_equip = "https://redive.estertion.win/icon/equipment/"
-redive_item_icon = "https://redive.estertion.win/icon/item/"
-redive_unit_icon = "https://redive.estertion.win/icon/unit/"
-redive_unit_card = "https://redive.estertion.win/card/full/"
-redive_unit_story = "https://redive.estertion.win/card/story/"
-redive_spine = "https://redive.estertion.win/spine/still/unit/"
-redive_spine_q = "https://redive.estertion.win/spine/unit/"
+ROOT_URL = "https://redive\.estertion\.win/"
+ROOT_URL = "http://127.0.0.1:5501/"
+redive_equip = ROOT_URL + "icon/equipment/"
+redive_item_icon = ROOT_URL + "icon/item/"
+redive_unit_icon = ROOT_URL + "icon/unit/"
+redive_unit_card = ROOT_URL + "card/full/"
+redive_unit_story = ROOT_URL + "card/story/"
+redive_spine = ROOT_URL + "spine/still/unit/"
+redive_spine_q = ROOT_URL + "spine/unit/"
 
 def get_png(redive, img_list=[], format="png", prefix=""):
     img_path = os.path.join(assert_path, "row")
     for name in img_list:
         name = str(name)
         print(name)
-        name_webp = str(name) + ".webp"
+        name_webp = str(name) + ".png" #".webp"
         url = redive + name_webp
         try:
             myfile = requests.get(url)
@@ -40,7 +42,7 @@ def get_png(redive, img_list=[], format="png", prefix=""):
         except:
             pass
         t = 0.2 + random.random()
-        time.sleep(t)
+        # time.sleep(t)
 
 
 def get_spine(unit_list=[]):
@@ -68,7 +70,7 @@ def get_spine(unit_list=[]):
             open(os.path.join(img_path, wf), "wb").write(myfile.content)
             myfile.close
         t = 0.2 + random.random()
-        time.sleep(t)
+        # time.sleep(t)
 
 
 def get_spine_q(unitq_list=[]):
@@ -89,7 +91,7 @@ def get_spine_q(unitq_list=[]):
             wf = name[:4] + "01_BATTLE.odg"
             open(os.path.join(img_path, wf), "wb").write(myfile.content)
             t = 0.2 + random.random()
-            time.sleep(t)
+            # time.sleep(t)
         for tp in [".atlas", ".png"]:
             file_name = name + tp
             url = redive + file_name
@@ -109,12 +111,12 @@ def get_spine_q(unitq_list=[]):
             open(os.path.join(img_path, wf), "wb").write(myfile.content)
             myfile.close
             t = 0.2 + random.random()
-            time.sleep(t)
+            # time.sleep(t)
 
 
 def get_spine_q2(unitq_list=[]):
     """特殊骨骼"""
-    redive = "https://redive.estertion.win/spine/common/"
+    redive = ROOT_URL + "spine/common/"
     # unitq_list = ["107001", "180101", "180201", "180301", "180401", "180501","180601",
     # "180701", "180801", "180901", "191501", "191601", "191701" ]
     img_path = os.path.join(assert_path, "动画", "unitq")
@@ -133,7 +135,7 @@ def get_spine_q2(unitq_list=[]):
             wf = name + "_" + tp + ".odg"
             open(os.path.join(img_path, wf), "wb").write(myfile.content)
             t = 0.2 + random.random()
-            time.sleep(t)
+            # time.sleep(t)
 
 
 def webp2png(name):
@@ -181,7 +183,8 @@ def get_library(img_list, format="png", prefix="", web_format=".png"):
 if __name__ == "__main__":
     # for name in equip_list:
     #     webp2png(name)
-    # get_spine_q2(["126001"])
+    get_new_imgs("1290")
+    # get_spine_q2(["129001", "129301", "129401"])
 
-    get_png(redive_unit_story, ["508000101", "508000301", "508000601", "508000701"], "jpg")
+    # get_png(redive_unit_story, ["211100601", "211100701", "211100702", "211100801"], "jpg")
     # get_png(redive_unit_icon, ["106415", "191312"], "png", "Icon_unit_")

@@ -46,8 +46,28 @@ def psy():
             last = data[3]
         f.write("{{对话|" + data[1] + "|" + (data[0] if data[0] is not None else "") + "|" + data[2].replace("\\\\n", "<br>") + "}}\n")
 
+
+def nop():
+    # 大家一起办年节菜派对
+    sql = """
+        select b.drama_id, u.unit_name, b.param_01, b.param_02
+        from nop_drama_script b join unit_data u 
+        on substr(b.param_01,1,4) = substr(u.unit_id,1,4)
+        where command_type=11
+        order by command_id asc"""
+
+    cursor.execute(sql)
+    all_data = cursor.fetchall()
+    last = None
+    for data in all_data:
+        if last is None or last != data[0]:
+            last = data[0]
+            f.write("===%s===\n" % data[1])
+        f.write("{{对话|" + data[2] + "|" + data[1] + "|" + data[3].replace("\\\\n", "<br>") + "}}\n")
+
 if __name__ == "__main__":
     # role()
     psy()
+    nop()
     f.close()
     conn.close()

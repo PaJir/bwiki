@@ -23,7 +23,7 @@ where r.drop_reward_id in (""" + \
     # print(cursor.fetchall())
     main_data = cursor.fetchall()
     if len(main_data) == 0:
-        return
+        return ""
 
     sql_where = """where r.drop_reward_id in (
 	select w.drop_reward_id_1 w from wave_group_data as w 

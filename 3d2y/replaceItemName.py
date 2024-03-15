@@ -256,9 +256,29 @@ def replaceImage(sheetname, old_folder, new_folder, backup_folder):
         # im = Image.fromarray(out_img)
         out_img.save(os.path.join(new_folder, "道具-"+file))
 
+def replaceAllImage(old_folder, new_folder):
+    if not os.path.exists(new_folder):
+        os.mkdir(new_folder)
+    files = os.listdir(old_folder)
+    for file in files:
+        if os.path.isdir(os.path.join(old_folder, file)):
+            replaceAllImage(os.path.join(old_folder, file), os.path.join(new_folder, file))
+            continue
+        image = Image.open(os.path.join(old_folder, file)).convert("RGBA")
+        image_np = np.array(image)
+        if len(image_np) > 160 or len(image_np[0]) > 160:
+            print(file, len(image_np), len(image_np[0]))
+            continue
+        for frame_type in ["铜", "银", "金", "彩"]:
+            out_img = Image.open(frame_type + "框.png").convert("RGBA")
+            left = (160 - len(image_np[0])) // 2
+            top = (160 - len(image_np)) // 2
+            out_img.paste(image, (left, top), image)
+            out_img.save(os.path.join(new_folder, frame_type+file))
 
 if __name__ == "__main__":
     # main()
     # getXlsxFile("徽章", "badge")
     # replaceImageName("道具图鉴无底")
-    replaceImage("道具图鉴", "道具图鉴无底", "道具图鉴有底", "道具图鉴无底\\备份")
+    # replaceImage("道具图鉴", "道具图鉴无底", "道具图鉴有底", "道具图鉴无底\\备份")
+    replaceAllImage("道具图鉴无底", "道具图鉴有底")

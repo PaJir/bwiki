@@ -26,3 +26,7 @@ def roomUnitComments(db_name, minid, append=True):
         wf.write(d + "\n")
     wf.close()
     conn.close()
+
+if __name__ == "__main__":
+    import config
+    roomUnitComments(config.db_name_jp, 7871)

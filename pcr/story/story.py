@@ -1,24 +1,17 @@
 import os
 
-# 新手教学 0
-# in_path = "./new"
-# 角色剧情 1
-in_path = "./unit"
-# 主线剧情 2
-# in_path = "./main"
-# 公会剧情 3
-in_path = "./guild"
-# 公会之家、竞技场、地下城等 4
-in_path = "./others"
-# 活动剧情 5 信赖度 6
-in_path = "./activity"
-# 露娜塔 7
-# in_path = "./lunar"
-# 推图BOSS 9
-# in_path = "./battle"
-out_path = in_path + "_out"
-
-start_episode = "000"  # from 000 or 001
+story_config = {
+    0: ["./new"],# 新手教学 0
+    1: ["./unit"],# 角色剧情 1
+    2: ["./main"],# 主线剧情 2
+    3: ["./guild"],# 公会剧情 3
+    4: ["./others"],# 公会之家、竞技场、地下城等 4
+    5: ["./activity"],# 活动剧情 5 信赖度 6
+    7: ["./lunar"],# 露娜塔 7
+    9: ["./battle"]# 推图BOSS 9
+}
+in_path = ""
+out_path = ""
 include_empty_title = True
 
 
@@ -61,18 +54,33 @@ def replaceId(id):
     return id
 
 
-def transform(in_file, out_file, first=False, _title=""):
+def transform(in_file, out_file, first=False, _title="", story_type=1):
     rf = open(os.path.join(in_path, in_file), "r", encoding="utf-8")
-    wf = open(os.path.join(out_path, out_file), "a+", encoding="utf-8")
     if first:
-        wf.close()
+        _title = _title.replace(" 下集预告", "")
         wf = open(os.path.join(out_path, out_file), "w+", encoding="utf-8")
-        # wf.write("{" + "{#set:\n|部=" + str(int(in_file[11])+1) + "\n|章=" + in_file[12:14] + "\n}" + "}")
-        # wf.write("{" + "{#set:\n|标题=\n|部=" + str(int(in_file[11])+1) + "\n|章=" + in_file[12:14] + "\n|话="+ in_file[15:17] + "\n}" + "}")
-        wf.write("{" + "{#set:\n|编号=" + in_file[12:14] + "\n}" + "}")
-        wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{")
-        wf.write("{DISPLAYTITLE:" + _title + "}" + "}[[分类:其他剧情]]")
-        # wf.write("\n{" + "{剧情|公会成员|所属:" + _title + "}" + "}")
+        if story_type == 1:
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:角色剧情]]")
+        elif story_type == 2:
+            wf.write("{" + "{#set:\n|部=" + str(int(in_file[11])+1) + "\n|章=" + in_file[12:14] + "\n}" + "}")
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:主线剧情]]")
+        elif story_type == 3:
+            wf.write("{" + "{#set:\n|编号=" + in_file[12:14] + "\n}" + "}")
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:公会剧情]]")
+            wf.write("\n{" + "{剧情|公会成员|所属:" + _title + "}" + "}")
+        elif story_type == 4 or story_type == 9:
+            wf.write("{" + "{#set:\n|编号=" + in_file[12:14] + "\n}" + "}")
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:其他剧情]]")
+        elif story_type == 5: # hatsune_item
+            wf.write("{" + "{#set:\n|编号=" + in_file[12:14] + "\n|碎片掉落=、|+sep=、" + "\n}" + "}")
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:活动剧情]][[分类:地图掉落]]")
+        elif story_type == 7:
+            wf.write("{" + "{#set:\n|编号=" + in_file[12:14] + "\n}" + "}")
+            wf.write("__TOC__{" + "{ResourceLoader|MediaWiki:Replacename|MIME=text/javascript}}{{DISPLAYTITLE:" + _title + "}" + "}[[分类:露娜塔剧情]]")
+        else:
+            pass
+    else:
+        wf = open(os.path.join(out_path, out_file), "a+", encoding="utf-8")
     wf.write("\n")
     line = rf.readline()
     title = ""  # 故事序号
@@ -86,7 +94,7 @@ def transform(in_file, out_file, first=False, _title=""):
     ttt = 0
     # shake = False
     episode = in_file[14:17]
-    if in_path == "./activity" and in_file[10] == '5':
+    if story_type == 5 and in_file[10] == '5':
         if episode == "202":
             wf.write("==首领战相关==\n===普通解锁===\n")
         elif episode == "203":
@@ -118,9 +126,13 @@ def transform(in_file, out_file, first=False, _title=""):
         elif line == "black_in":
             black_in = getText(rf)
             # black_in = title
+            if story_type == 5 and in_file[10] == '5' and episode in ["202", "203", "204", "301", "302", "308", "321", "322", "323"]:
+                pass
+            elif episode == "500":
+                pass
             wf.write("==")
             # wf.write("第" + title.split("第")[-1])
-            if in_path == "./activity":
+            if story_type == 5:
                 if episode == "000":
                     wf.write("序章 ")
                 elif episode == "007":
@@ -143,9 +155,17 @@ def transform(in_file, out_file, first=False, _title=""):
                     wf.write("第" + episode[2] + "话 ")
             elif not black_in.startswith("幕间"):
                 wf.write("第" + str(int(episode[1:3])) + "话 ")
-            wf.write(black_in + "==\n")
+            wf.write(black_in)
+            if story_type == 5 and episode in ["401", "402", "403", "404", "405"]:
+                wf.write("=")
+            wf.write("==\n")
             if outline not in ["", " ", "\t"]:
                 wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + outline + "\n}" + "}\n")
+        elif line == "type" and black_in == "" and title != "": # 标题的备选项
+            if story_type == 5 and in_file[10] == '5' and episode == "101":
+                wf.write("==预告 " + title + "==\n")
+                wf.write("{" + "{折叠|宽度=100%\n|标题=剧情梗概\n|内容=" + outline + "\n}" + "}\n")
+            title = ""
         elif line == "chord_l":  # type / chord_l 对话角色转换
             chord = getNext(rf)
             chord = replaceId(chord)
@@ -180,7 +200,7 @@ def transform(in_file, out_file, first=False, _title=""):
                     line = getNext(rf)
                 line = getNext(rf)
             line += "\n"
-            print(bgms)
+            # print(bgms)
             if bgms_count == 1:
                 bgms = {}
                 wf.write("{" + "{对话|191711|佑树|" + text)  # + "}" + "}\n")
@@ -214,45 +234,40 @@ def transform(in_file, out_file, first=False, _title=""):
         line = rf.readline()
     # wf.write("{" + "{剧情导航" + "}" + "}")
 
-
-if __name__ == "__main__":
+def story(story_type=1):
+    global in_path, out_path, start_episode
+    in_path = story_config[story_type][0]
+    out_path = in_path + "_out"
+    start_episode = "000"
     files = os.listdir(in_path)
     for in_file in files:
         if not include_empty_title and in_file.find("[ ]") != -1:
             continue
         out_file = in_file[:14] + ".txt"
+        # if out_file != "storydata_5031.txt":
+        #     continue
         episode = in_file[14:17]
-        if in_path == "./activity":
-            if episode in ["422", "423", "424", "425"]:
+        if story_type == 5:
+            if episode in ["101", "422", "423", "424", "425"]:
                 continue
+            elif episode == "000":
+                yugao = in_file[:14] + "101"
+                for f in files:
+                    if f.startswith(yugao):
+                        yugao = f
+                        transform(yugao, out_file, True, yugao.split("[")[1].split("]")[0], story_type)
+                        break
         if in_file[10] == '5':
-            start_episode = "000"
+            start_episode = "101"
         elif in_file[10] == '6':
             start_episode = "101"
+        elif in_file[10] == '7':
+            start_episode = "000"
         else:
             start_episode = "001"
-        first = True if episode == start_episode else False  # TODO: 000 or 001
-        # out_file = in_file[:17] + ".txt"
-        # first = True
+        first = True if episode == start_episode else False
         t = int(in_file[12:14])
-        guilds = [
-            "",
-            "美食殿堂",
-            "王宫骑士团",
-            "咲恋救济院",
-            "自卫团",
-            "伊丽莎白牧场",
-            "拉比林斯",
-            "破晓之星",
-            "墨丘利财团",
-            "森林守卫",
-            "慈乐之音",
-            "暮光流星群",
-            "纯白之翼",
-            "小小甜心",
-            "恶魔伪王国军",
-            "月光学院",
-            "圣特蕾莎女子学院（好朋友社）",
-            "龙族据点"]
+        transform(in_file, out_file, first, in_file.split("[")[1].split("]")[0], story_type)
 
-        transform(in_file, out_file, first)
+if __name__ == "__main__":
+    story(5)
