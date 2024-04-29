@@ -7,8 +7,9 @@ write_file = "drama.txt"
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
 conn_jp = sqlite3.connect(db_name_jp)
+cursor_jp = conn_jp.cursor()
 
-f = open(write_file, "w+", encoding="UTF-8")
+f = None
 
 def role():
     sql = """
@@ -66,9 +67,15 @@ def nop():
 
 def wac():
     # 2024年3月31日开始的公会成员庆祝生日演出
+    sql_cn = """select substr(u.unit_id,1,4) || '11', u.unit_name from unit_data u;"""
+    cursor.execute(sql_cn)
+    id_name = cursor.fetchall()
+    id_name_map = {}
+    for x in id_name:
+        id_name_map[x[0]] = x[1]
     sql = """select date_id, unlock_time from wac_data order by date_id; """
-    cursor.execute(sql)
-    wac_data = cursor.fetchall()
+    cursor_jp.execute(sql)
+    wac_data = cursor_jp.fetchall()
     for wac in wac_data:
         sql = """select u.unit_name, w.param_01, w.param_02 
         from wac_birthday_drama_script w join unit_data u 
@@ -80,16 +87,22 @@ def wac():
         on substr(w.param_01,1,4) = substr(u.unit_id,1,4)
         where w.drama_id=""" + str(wac[0]) + """2 and command_type=11 
         order by command_id;"""
-        cursor.execute(sql)
-        all_data = cursor.fetchall()
-        f.write("%s\n==角色生日公会庆祝==\n" % wac[1])
+        cursor_jp.execute(sql)
+        all_data = cursor_jp.fetchall()
+        if len(all_data) > 0:
+            f.write("==%s==\n%s\n" % (id_name_map.get(all_data[0][1], all_data[0][0]), wac[1].split(" ")[0]))
+        else:
+            f.write("====\n%s\n" % wac[1].split(" ")[0])
         for data in all_data:
-            f.write("{{对话|%s|%s|%s}}\n" % (data[1], data[0], data[2].replace("\\\\n", "<br>")))
-        cursor.execute(sql2)
-        all_data = cursor.fetchall()
-        f.write("[[file:wac_.png|center]]\n")
+            f.write("{{对话|%s|%s|%s}}\n" % (data[1], id_name_map.get(data[1], data[0]), data[2].replace("\\\\n", "<br>")))
+        cursor_jp.execute(sql2)
+        all_data = cursor_jp.fetchall()
+        if len(all_data) > 0:
+            f.write("[[file:wac_%s.png|center]]\n" % id_name_map.get(all_data[0][1], all_data[0][0]))
+        else:
+            f.write("[[file:wac_.png|center]]\n")
         for data in all_data:
-            f.write("{{对话|%s|%s|%s}}\n" % (data[1], data[0], data[2].replace("\\\\n", "<br>")))
+            f.write("{{对话|%s|%s|%s}}\n" % (data[1], id_name_map.get(data[1], data[0]), data[2].replace("\\\\n", "<br>")))
 
 
 def dragon():
@@ -111,8 +124,8 @@ def dragon():
         f.write("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>\n")
         for j in range(st, ed):
             f.write("| " + data[j][1] + 
-                " || " + data[j][6] + 
-                " || " + data[j][7] + 
+                " || " + data[j][-2] + 
+                " || " + data[j][-1] + 
                 " || " + type_map[data[j][2]] + 
                 " || " + data[j][4] + 
                 " || " + str(data[j][5]) + "\n")
@@ -122,17 +135,105 @@ def dragon():
     f.write("| rowspan=" + str(ed-st) + " | <div class=\"dragon-game-item\" data-icon-id=\"" + str(data[st][3]) + "\"></div>\n")
     for j in range(st, ed):
         f.write("| " + data[j][1] + 
-            " || " + data[j][6] + 
-            " || " + data[j][7] + 
+            " || " + data[j][-2] + 
+            " || " + data[j][-1] + 
             " || " + type_map[data[j][2]] + 
             " || " + data[j][4] +
             " || " + str(data[j][5]) + "\n")
         f.write("|-\n")
 
+def dragonFilter():
+    # 龙与探险者
+    sql = "select * from srt_panel order by reading_id"
+
+    cursor.execute(sql)
+    # [(1000100, '苹果', 1, 10001, '红色，酸酸甜甜的水果。', 1, 'ing', 'o')]
+    data = cursor.fetchall()
+    for d in data:
+        f.write('<div class="trcard" data-param1="%s" data-param2="%s"><div class="dragon-game-item%s" data-icon-id="%d"></div><div class="black-white-text">%s</div></div>\n' %
+                 (d[6], d[7], "" if d[5] == 1 else "2", d[3], d[1]))
+
+def taq():
+    # 谜题连结
+    sql = "select genre, taq_type, difficulty, detail, detail_2, assist_detail from taq_data order by taq_no"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    for d in data:
+        txt = '|-data-param1="%d" data-param2="%d" data-param3="%d"\n|%s||%s||%s\n' % (d[0], d[1], d[2], d[3], d[4], d[5])
+        txt = txt.replace("\\n", "<br>")
+        f.write(txt)
+
+def arena_daily():
+    id_name = {
+        91002: "宝石",
+        94002: "玛那",
+        20001: "迷你经验药剂",
+        20002: "经验药剂",
+        20003: "高级经验药剂",
+        20004: "超级经验药剂",
+        20005: "究极经验药剂",
+        22001: "精炼石",
+        22002: "上等精炼石",
+        22003: "精炼结晶",
+        0: ""
+    }
+    sql = "select rank_from, rank_to, reward_id_1, reward_num_1, reward_id_2, reward_num_2, reward_id_3, reward_num_3, reward_id_4, reward_num_4 from arena_daily_rank_reward order by id"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    for d in data:
+        if d[0] == d[1]:
+            rank_from_to = str(d[0])
+        else:
+            rank_from_to = "%d-%d" % (d[0], d[1])
+        if d[9] > 0:
+            _22 = "[[file:%s.png|35px|link=]]*%d" % (id_name[d[8]], d[9])
+        else:
+            _22 = "无"
+        txt = "|-\n|%s||[[file:%s.png|35px|link=]]*%d||[[file:%s.png|35px|link=]]*%d||[[file:%s.png|35px|link=]]*%d||%s\n" % (rank_from_to, id_name[d[2]], d[3], id_name[d[4]], d[5], id_name[d[6]], d[7], _22)
+        f.write(txt)
+
+def experience():
+    from math import ceil
+    exps = [60, 300, 1500, 7500, 37500]
+    items = [20001, 20002, 20003, 20004, 20005]
+    sql1 = "select team_level, total_exp, max_stamina from experience_team order by team_level;"
+    sql2 = "select unit_level, total_exp from experience_unit order by unit_level;"
+    cursor_jp.execute(sql1)
+    team = cursor_jp.fetchall()
+    cursor_jp.execute(sql2)
+    unit = cursor_jp.fetchall()
+    last_team_total_exp = 0
+    last_unit_total_exp = 0
+    for idx in range(len(unit)):
+        if idx >= len(team):
+            team_str = " || || || "
+        else:
+            team_str = "[[File:佑树.png|25px]] Lv.%d||%d||%d||%d" % (team[idx][0], team[idx][1]-last_team_total_exp, team[idx][1], team[idx][2])
+            last_team_total_exp = team[idx][1]
+        need_exp = unit[idx][1] - last_unit_total_exp
+        for i in range(len(exps)):
+            if exps[i] >= need_exp or i == len(exps) - 1:
+                items_idx1 = items[i]
+                items_num1 = ceil(need_exp / exps[i])
+                break
+        for i in range(len(exps)):
+            if exps[i] >= unit[idx][1] or i == len(exps) - 1:
+                items_idx2 = items[i]
+                items_num2 = ceil(unit[idx][1] / exps[i])
+                break
+        unit_str = "[[File:Icon_unit_170131.png|25px]] Lv.%d||%d||[[File:Icon_item_%d.png|25px]]x%d||%d||[[File:Icon_item_%d.png|25px]]x%d" % (unit[idx][0], need_exp, items_idx1, items_num1, unit[idx][1], items_idx2, items_num2)
+        last_unit_total_exp = unit[idx][1]
+        f.write("|-\n|%s||%s\n" % (team_str, unit_str))
+
 if __name__ == "__main__":
+    f = open(write_file, "w+", encoding="UTF-8")
     # role()
     # psy()
     # nop()
-    wac()
+    # wac()
+    # dragonFilter()
+    # taq()
+    # arena_daily()
+    experience()
     f.close()
     conn.close()

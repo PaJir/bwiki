@@ -23,20 +23,14 @@ p1 = re.compile(r'[（](.*?)[）]', re.S) # 匹配括号内的内容
 def audio(id, cur):
     id = str(id)
     desp = []
-    for i in range(1, 18):
-        sql = "select description from unit_comments where id = " + id + str(i).zfill(3)
-        cur.execute(sql)
-        d = cur.fetchone()
-        if d is None:
-            break
-        desp.append(d[0].replace("\\\\n","<br/>").replace("\\n", "<br/>").replace("\\u3000", "　"))
-    x1 = "￥".join(desp[0:5])
-    x3 = "￥".join(desp[5:10])
-    birth = "￥".join(desp[10:12])
-    x6 = ""
-    if len(desp) == 17:
-        x6 = "￥".join(desp[12:17])
-    return (x1+split_at+x3+split_at+birth+split_at+x6+split_at*3).replace("?", "♪").replace("\\u3000", "　")
+    sql = "select unit_id, description from unit_comments where substr(id, 1, 4) = '" + id + "' order by unit_id, voice_id;"
+    cur.execute(sql)
+    d = cur.fetchall()
+    for tp in ["0", "3", "6"]:
+        x = list(filter(lambda x : str(x[0])[4] == tp, d))
+        x = "￥".join([y[1] for y in x])
+        desp.append(x)
+    return (split_at.join(desp)+split_at*3).replace("?", "♪").replace("\\\\n","<br/>").replace("\\n", "<br/>").replace("\\u3000", "　")
 # JP RANK装备
 def rank(id):
     if id == "1701":
@@ -188,10 +182,10 @@ def role_main(data, cur):
     # 生日
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
     # 页面名 角色ID 角色名/手动 日文名/手动 翻译名 片假名/手动 平假名/手动 角色介绍 是否实装/手动 是否专武/手动 是否6星/手动 是否二专/手动
-    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>")+split_at*5) 
-    # kana 外号（手动） CV 初始星级 限定 节日 类型 所属 碎片获取（手动）
-    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+data[8]+split_at*2)
-    # 1星立绘语音 3星立绘语音 生日语音 UB语音 六星UB语音
+    f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>").replace("\\n","<br/>")+split_at*5) 
+    # kana 外号（手动） CV 初始星级 限定 节日 类型 属性（手动） 所属 碎片获取（手动）
+    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at*2+data[8]+split_at*2)
+    # 1星立绘语音 3星立绘语音 UB语音 六星UB语音
     f.write(audio(id, cur))
     # 身高 体重 年龄 生日 血型 种族 兴趣 
     if fes != "":

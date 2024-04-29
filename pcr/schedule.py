@@ -12,7 +12,7 @@ def dateFormat(d):
     return d.replace("/", "-")[:-3].replace(" 5:", " 05:").replace(" 4:", " 04:").replace("  ", " ")
 
 
-def schedule(db_name):
+def schedule(db_name, note=""):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     # 卡池
@@ -74,19 +74,19 @@ def schedule(db_name):
                 continue
             wf.write("{{活动记录|开始时间=" + dateFormat(data[2]) + "|结束时间=" + dateFormat(data[3]) + "|活动=")
             if data[0] == 31:
-                wf.write("普通关卡庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("普通关卡庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 32:
-                wf.write("困难关卡庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("困难关卡庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 34:
-                wf.write("探索庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("探索庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 45:
-                wf.write("地下城庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍玛那|备注=}}\n")
+                wf.write("地下城庆典|角色=|详情=%s倍玛那|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 37:
-                wf.write("调查庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("调查庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 39:
-                wf.write("高难关卡庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("高难关卡庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
             elif data[0] == 91:
-                wf.write("大师币庆典|角色=|详情=" + '{:g}'.format(data[1]/1000) + "倍掉落|备注=}}\n")
+                wf.write("大师币庆典|角色=|详情=%s倍掉落|备注=%s}}\n" % ('{:g}'.format(data[1]/1000), note))
     # 露娜之塔
     sql = """select tower_schedule_id, max_tower_area_id, start_time, end_time
     from tower_schedule
@@ -110,3 +110,8 @@ def schedule(db_name):
             wf.write("团队战|角色=|详情=" + id + "|备注=}}\n")
     # 兰德索尔杯
     # chara_fortune_schedule
+
+if __name__ == "__main__":
+    from config import db_name, db_name_jp
+    schedule(db_name)
+    # schedule(db_name_jp, "日服")

@@ -4,10 +4,8 @@ from config import db_name
 from skill import attackPattern
 
 write_file = "enemy.txt"
-wf = open(write_file, "w", encoding="utf-8")
-
-conn = sqlite3.connect(db_name)
-cursor = conn.cursor()
+wf = None
+cursor = None
 
 
 def questN(quest_id, area_id):
@@ -24,7 +22,7 @@ def questN(quest_id, area_id):
 
 
 def getEnemyData(quest):
-    (quest_id, area_id, unit_id, enemy_id) = quest
+    (quest_id, area_id, unit_id, enemy_id, sub_area_id) = quest
     # assert unit_id % 100 == 0
     sql = "SELECT unit_name, comment FROM unit_enemy_data " + \
         "WHERE unit_id=" + \
@@ -39,7 +37,7 @@ def getEnemyData(quest):
 
 def getEnemyQuestData(quest):
     wd = list()  # write data
-    (quest_id, area_id, unit_id, enemy_id) = quest
+    (quest_id, area_id, unit_id, enemy_id, sub_area_id) = quest
     # assert unit_id % 100 == 0
     sql = "SELECT u.unit_name, u.comment, e.level, e.hp, e.atk, e.magic_str, e.def, e.magic_def, e.physical_critical, e.magic_critical, e.wave_hp_recovery, e.wave_energy_recovery, e.dodge, e.life_steal, e.hp_recovery_rate, e.energy_recovery_rate, e.energy_reduce_rate, e.accuracy, " + \
         "e.main_skill_lv_1, e.main_skill_lv_2, e.main_skill_lv_3, e.main_skill_lv_4, e.main_skill_lv_5, e.main_skill_lv_6, e.main_skill_lv_7, e.main_skill_lv_8, e.main_skill_lv_9, e.main_skill_lv_10, e.ex_skill_lv_1, e.ex_skill_lv_2, e.ex_skill_lv_3, e.ex_skill_lv_4, e.ex_skill_lv_5, " + \
@@ -66,23 +64,79 @@ def getEnemyQuestData(quest):
 
 
 def getLastQuest():
-    sql = "SELECT max(q.quest_id), q.area_id, e.unit_id, e.enemy_id " + \
-        "FROM quest_data q, wave_group_data w, enemy_parameter e " + \
-        "WHERE q.wave_group_id_3=w.wave_group_id and w.enemy_id_1=e.enemy_id and q.area_id<13000 " + \
-        "GROUP BY q.area_id ORDER BY q.quest_id ASC"
+    sql = """select * from (
+        SELECT max(q.quest_id), q.area_id, e.unit_id, e.enemy_id, substr(q.area_id, 3) as sub_area_id
+        FROM quest_data q 
+        join wave_group_data w on q.wave_group_id_3=w.wave_group_id
+        join enemy_parameter e on w.enemy_id_1=e.enemy_id
+        WHERE q.area_id<13000 and e.unit_id > 300000 
+        GROUP BY q.area_id 
+        ORDER BY substr(q.quest_id,3), q.quest_id 
+        ) order by sub_area_id, area_id;"""
     cursor.execute(sql)
     quest_list = cursor.fetchall()
+    last_unit_id = 0
     for quest in quest_list:
-        getEnemyData(quest)
-    for quest_idx in range(0, len(quest_list)//2):
-        getEnemyQuestData(quest_list[quest_idx])
-        getEnemyQuestData(quest_list[quest_idx + len(quest_list)//2])
+        if quest[2] // 100 == last_unit_id:
+            continue
+        else:
+            last_unit_id = quest[2] // 100
+            getEnemyData(quest)
+    for quest in quest_list:
+        getEnemyQuestData(quest)
 
 
-getLastQuest()
-wf.close()
-cursor.close()
-conn.close()
+def getEnemy(enemy_id, father_name=""):
+    if enemy_id == 0:
+        return
+    sql = """select * 
+        from dungeon_quest_area
+        group by dungeon_area_id"""
+    """enemy_m_parts"""
+    sql = """select e.name, e.enemy_id, e.unit_id, u.comment, e.level, e.hp, e.atk, e.magic_str, e.def, e.magic_def, e.physical_critical, e.magic_critical, e.wave_hp_recovery, e.wave_energy_recovery, e.dodge, e.life_steal, e.hp_recovery_rate, e.energy_recovery_rate, e.energy_reduce_rate, e.accuracy, 
+        u.move_speed, u.search_area_width, u.normal_atk_cast_time
+        from unit_enemy_data u join enemy_parameter e on u.unit_id=e.unit_id
+        where e.enemy_id=%d""" % (enemy_id)
+    cursor.execute(sql)
+    enemy_parameter = cursor.fetchone()
+    if enemy_parameter is None:
+        return
+    enemy_parameter = [str(x) for x in enemy_parameter]
+    area = enemy_parameter[0] if father_name!="" else ""
+    (starts, loops) = attackPattern(enemy_parameter[2], cursor)
+    enemy_parameter[3] = "<br>·".join(enemy_parameter[3].replace("\\\\n", "").replace("\\u3000", "").split("·"))
+    data = "\t".join([father_name+enemy_parameter[0], enemy_parameter[2], area] + enemy_parameter[3:] + [starts, loops])
+    wf.write(data + "\n")
+    # part
+    sql = """select child_enemy_parameter_1, child_enemy_parameter_2, child_enemy_parameter_3, child_enemy_parameter_4, child_enemy_parameter_5 
+        from enemy_m_parts ep
+        where enemy_id = %d""" % (enemy_id)
+    cursor.execute(sql)
+    children = cursor.fetchone()
+    if children is not None:
+        for child_enemy_id in children:
+            getEnemy(child_enemy_id, enemy_parameter[0]+"/")
+
+
+def getDungeon():
+    sql = """select enemy_id_1, enemy_id_2, enemy_id_3, enemy_id_4 
+        from wave_group_data 
+        where id > 501000000 and id < 502000000 order by id"""
+    cursor.execute(sql)
+    enemy_id_list = cursor.fetchall()
+    for enemy_ids in enemy_id_list:
+        for enemy_id in enemy_ids:
+            getEnemy(enemy_id)
+
+if __name__ == "__main__":
+    wf = open(write_file, "w", encoding="utf-8")
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    # getLastQuest()
+    getDungeon()
+    wf.close()
+    cursor.close()
+    conn.close()
 
 """ 备注
 unity_enemy_data    | unit_id  | unit_name | prefab_id | move_speed | search_area_width | atk_type | normal_atk_cast_time | comment

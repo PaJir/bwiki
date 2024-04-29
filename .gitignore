@@ -16,3 +16,4 @@ dist
 *.spec
 *.json
 *.min.js
+*.webm

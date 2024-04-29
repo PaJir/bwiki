@@ -140,6 +140,86 @@ fields = ["角色ID",
           "6x属性",
           "6x属性强化"]
 
+fields_equip = [
+    "装备编号", 
+    "装备名称", 
+    "装备描述", 
+    "装备种类", 
+    "装等", 
+    "售价", 
+    "使用等级", 
+    "HP", 
+    "物理攻击", 
+    "魔法攻击", 
+    "物理防御", 
+    "魔法防御", 
+    "物理暴击", 
+    "魔法暴击", 
+    "HP自动回复", 
+    "TP自动回复", 
+    "回避", 
+    "生命吸收", 
+    "HP上升", 
+    "TP上升", 
+    "TP消耗减少", 
+    "命中", 
+    "HP强化", 
+    "物理攻击强化", 
+    "魔法攻击强化", 
+    "物理防御强化", 
+    "魔法防御强化", 
+    "物理暴击强化", 
+    "魔法暴击强化", 
+    "HP自动回复强化", 
+    "TP自动回复强化", 
+    "回避强化", 
+    "生命吸收强化", 
+    "HP上升强化", 
+    "TP上升强化", 
+    "TP消耗减少强化", 
+    "命中强化", 
+    "初始RANK", 
+    "初始地图", 
+    "合成价格", 
+    "合成材料", 
+    "孤儿装"
+]
+
+fields_unique = [
+    "装备编号", 
+    "装备名称", 
+    "装备描述", 
+    "HP", 
+    "物理攻击", 
+    "魔法攻击", 
+    "物理防御", 
+    "魔法防御", 
+    "物理暴击", 
+    "魔法暴击", 
+    "HP自动回复", 
+    "TP自动回复", 
+    "回避", 
+    "生命吸收", 
+    "HP上升", 
+    "TP上升", 
+    "TP消耗减少", 
+    "命中", 
+    "HP强化", 
+    "物理攻击强化", 
+    "魔法攻击强化", 
+    "物理防御强化", 
+    "魔法防御强化", 
+    "物理暴击强化", 
+    "魔法暴击强化", 
+    "HP自动回复强化", 
+    "TP自动回复强化", 
+    "回避强化", 
+    "生命吸收强化", 
+    "HP上升强化", 
+    "TP上升强化", 
+    "TP消耗减少强化", 
+    "命中强化"
+]
 
 def process():
     data = None
@@ -242,52 +322,9 @@ def read_xml():
             output = field_map.get("翻译名", "") + "\t" + "\t".join(output) + "\n"
             wf.write(output)
 
-
-def read_xml_equip():
-    fields = ["装备编号", 
-"装备名称", 
-"装备描述", 
-"装备种类", 
-"装等", 
-"售价", 
-"使用等级", 
-"HP", 
-"物理攻击", 
-"魔法攻击", 
-"物理防御", 
-"魔法防御", 
-"物理暴击", 
-"魔法暴击", 
-"HP自动回复", 
-"TP自动回复", 
-"回避", 
-"生命吸收", 
-"HP上升", 
-"TP上升", 
-"TP消耗减少", 
-"命中", 
-"HP强化", 
-"物理攻击强化", 
-"魔法攻击强化", 
-"物理防御强化", 
-"魔法防御强化", 
-"物理暴击强化", 
-"魔法暴击强化", 
-"HP自动回复强化", 
-"TP自动回复强化", 
-"回避强化", 
-"生命吸收强化", 
-"HP上升强化", 
-"TP上升强化", 
-"TP消耗减少强化", 
-"命中强化", 
-"初始RANK", 
-"初始地图", 
-"合成价格", 
-"合成材料", 
-"孤儿装"]
+def read_xml_common(inputfile, fields):
     html = None
-    with open("wiki_export_equip.xml", "r", encoding="utf-8") as rf:
+    with open(inputfile, "r", encoding="utf-8") as rf:
         html = rf.readlines()
     html = "".join(html)
     soup = BeautifulSoup(html, "xml")
@@ -310,5 +347,6 @@ def read_xml_equip():
 
 if __name__ == "__main__":
     # process()
-    read_xml()
-    # read_xml_equip()
+    # read_xml()
+    read_xml_common("wiki_export_equip.xml", fields_equip)
+    read_xml_common("wiki_export_unique.xml", fields_unique)
