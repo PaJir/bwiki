@@ -75,6 +75,15 @@ def rarity(id):
             r.append("、".join(r_i[0:15]))
             r.append("、".join(r_i[15:30]))
     return split_at.join(r) + split_at
+def exequip(id):
+    if id == "1701":
+        id = "1057"
+    elif id == "1702":
+        id = "1026"
+    sql = "select slot_category_1, slot_category_2, slot_category_3 from unit_ex_equipment_slot where unit_id = \"%s01\"" % id
+    cursor_jp.execute(sql)
+    d = cursor_jp.fetchone()
+    return str(d[0]) + "," + str(d[1]) + "," + str(d[2])
 
 # CN&JP
 def chara_story_status(id):
@@ -167,7 +176,10 @@ def role_main(data, cur):
         fes = ""
     else:
         fes = fes[0]
+    # fes = ""
     # 4位id
+    if data[1] in [110201, 123401]:
+        return
     id = str(data[1])[0:4]
     # 角色（全）名
     role_name = data[2]
@@ -183,8 +195,8 @@ def role_main(data, cur):
     birthday = str(data[12]) + "月" + str(data[13]) + "日"
     # 页面名 角色ID 角色名/手动 日文名/手动 翻译名 片假名/手动 平假名/手动 角色介绍 是否实装/手动 是否专武/手动 是否6星/手动 是否二专/手动
     f.write(data[3]+split_at+id+split_at+(role_name if fes=="" else "")+split_at*2+data[3]+split_at*3+data[0].replace("\\\\n","<br/>").replace("\\n","<br/>")+split_at*5) 
-    # kana 外号（手动） CV 初始星级 限定 节日 类型 属性（手动） 所属 碎片获取（手动）
-    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at*2+data[8]+split_at*2)
+    # kana 外号（手动） CV 初始星级 限定 节日 类型 属性（手动） 职业 EX装备 所属 碎片获取（手动）
+    f.write(data[4]+split_at*2+(data[5] if fes=="" else "")+split_at+str(data[6])+split_at+str(data[7])+split_at+fes+split_at+pos_type+split_at+""+split_at+str(data[21])+split_at+exequip(id)+split_at+data[8]+split_at*2)
     # 1星立绘语音 3星立绘语音 UB语音 六星UB语音
     f.write(audio(id, cur))
     # 身高 体重 年龄 生日 血型 种族 兴趣 
@@ -207,7 +219,7 @@ def role_main(data, cur):
     # 起手顺序 行动顺序 
     f.write(attack_pattern(id, cur))
     # R1-R32
-    f.write(rank(id))
+    # f.write(rank(id))
     # R1-R24属性
     # f.write(unit_promotion_status(id))
     # 基础属性及其成长速度 (15)2*6
@@ -218,7 +230,7 @@ def role(filter=[]):
     sql2 = """
         select d.comment _0, d.unit_id _1, b.unit_name _2, d.unit_name _3, 
         d.kana _4, p.voice _5, d.rarity _6, is_limited _7, p.guild _8, 
-        p.height _9, p.weight _10, p.age _11, p.birth_month _12, p.birth_day _13, p.blood_type _14, p.race _15, p.favorite _16, d.search_area_width _17, d.atk_type _18, d.normal_atk_cast_time _19, p.catch_copy _20 
+        p.height _9, p.weight _10, p.age _11, p.birth_month _12, p.birth_day _13, p.blood_type _14, p.race _15, p.favorite _16, d.search_area_width _17, d.atk_type _18, d.normal_atk_cast_time _19, p.catch_copy _20, d.motion_type _21 
         from unit_data d join unit_profile p join actual_unit_background b on d.unit_id = p.unit_id and substr(p.unit_id, 1, 4) = substr(b.unit_id, 1, 4) 
         where d.unit_id < 190801 
         order by d.unit_id asc"""
@@ -226,7 +238,7 @@ def role(filter=[]):
     sql = """
         select d.comment _0, d.unit_id _1, d.unit_name _2, d.unit_name _3, 
         d.kana _4, p.voice _5, d.rarity _6, is_limited _7, p.guild _8, 
-        p.height _9, p.weight _10, p.age _11, p.birth_month _12, p.birth_day _13, p.blood_type _14, p.race _15, p.favorite _16, d.search_area_width _17, d.atk_type _18, d.normal_atk_cast_time _19, p.catch_copy _20 
+        p.height _9, p.weight _10, p.age _11, p.birth_month _12, p.birth_day _13, p.blood_type _14, p.race _15, p.favorite _16, d.search_area_width _17, d.atk_type _18, d.normal_atk_cast_time _19, p.catch_copy _20, d.motion_type _21 
         from unit_data d join unit_profile p on d.unit_id = p.unit_id
         where d.unit_id < 190801 
         order by d.unit_id asc"""

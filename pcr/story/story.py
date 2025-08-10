@@ -39,7 +39,9 @@ rep = {
 
 
 def replaceId(id):
-    if id == "0":
+    if ":" in id:
+        id = ""
+    elif len(id) == 1:
         id = ""
     elif len(id) == 3:
         id = "000" + id
@@ -257,14 +259,7 @@ def story(story_type=1):
                         yugao = f
                         transform(yugao, out_file, True, yugao.split("[")[1].split("]")[0], story_type)
                         break
-        if in_file[10] == '5':
-            start_episode = "101"
-        elif in_file[10] == '6':
-            start_episode = "101"
-        elif in_file[10] == '7':
-            start_episode = "000"
-        else:
-            start_episode = "001"
+        start_episode = {5:"101",6:"101",7:"000"}.get(int(in_file[10]), "001")
         first = True if episode == start_episode else False
         t = int(in_file[12:14])
         transform(in_file, out_file, first, in_file.split("[")[1].split("]")[0], story_type)

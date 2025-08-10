@@ -225,6 +225,37 @@ def experience():
         last_unit_total_exp = unit[idx][1]
         f.write("|-\n|%s||%s\n" % (team_str, unit_str))
 
+def level_cost():
+    sql = "select target_level, cost from skill_cost order by target_level"
+
+def unique_cost():
+    sql = "select unit_level, consume_num_2, consume_num_1, crafted_cost from unique_equipment_rankup where equip_id=130011 order by unit_level"
+    cursor_jp.execute(sql)
+    data = cursor_jp.fetchall()
+    sql2 = "select enhance_level, needed_point, needed_mana from unique_equipment_enhance_data where equip_slot=1 order by enhance_level"
+    cursor_jp.execute(sql2)
+    enhance = cursor_jp.fetchall()
+    data = [[1, 0, 0, 0]] + data
+    data.append([enhance[-1][0], 0, 0, 0])
+    for i in range(1, len(data)-1):
+        txt = "|-\n|界限突破(Lv%d-Lv%d)||碎片%d||%d||%d万\n" % (data[i][0], data[i+1][0], data[i][1], data[i][2], data[i][3]/10000)
+        f.write(txt)
+    i = 1
+    total_point, total_mana = 0, 0
+    all_point, all_mana = 0, 0
+    for e in enhance:
+        total_point += e[1]
+        total_mana += e[1] * e[2]
+        if e[0] == data[i][0]:
+            txt = "|-\n|Lv{:d}-Lv{:d} || {:d} || {:g}万\n".format(data[i-1][0], data[i][0], total_point, total_mana/10000)
+            f.write(txt)
+            i += 1
+            all_point += total_point
+            all_mana += total_mana
+            total_point, total_mana = 0, 0
+    txt = "|-\n|合计|| {:d} || {:g}万\n".format(all_point, all_mana/10000)
+    f.write(txt)
+
 if __name__ == "__main__":
     f = open(write_file, "w+", encoding="UTF-8")
     # role()
@@ -234,6 +265,8 @@ if __name__ == "__main__":
     # dragonFilter()
     # taq()
     # arena_daily()
-    experience()
+    # experience()
+    unique_cost()
     f.close()
     conn.close()
+    conn_jp.close()

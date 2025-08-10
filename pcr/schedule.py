@@ -2,6 +2,7 @@
 import sqlite3
 import io
 import re
+from config import id_name_cn
 
 write_file = "schedule.txt"
 
@@ -16,7 +17,7 @@ def schedule(db_name, note=""):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     # 卡池
-    sql = """select gacha_id, gacha_name, description, start_time, end_time
+    sql = """select gacha_id, gacha_name, description, start_time, end_time, exchange_id, prizegacha_id
     from gacha_data
     where gacha_id >= 30000 and gacha_id < 60000 and start_time > '2020/1/3 15:59:59'
     order by exchange_id;"""
@@ -25,11 +26,16 @@ def schedule(db_name, note=""):
     with open(write_file, "w+", encoding="utf-8") as wf:
         p = re.compile(r'「(.*?)」', re.S)
         for data in all_data:
-            roles = re.findall(p, data[2])
             wf.write("{{活动记录|开始时间=" + dateFormat(data[3]) + "|结束时间=" + dateFormat(data[4]) + "|活动=卡池|角色=")
-            wf.write('、'.join(roles))
+            # roles = re.findall(p, data[2])
+            # wf.write('、'.join(roles))
+            sql = "select unit_id from gacha_exchange_lineup where exchange_id=%d order by unit_id" %  data[5]
+            cursor.execute(sql)
+            units = cursor.fetchall()
+            wf.write('、'.join([id_name_cn[str(x[0])[:4]] for x in units]))
             wf.write("|详情=|备注=")
-            if data[1] == "附奖扭蛋" or data[2].find("复刻") != -1:
+            # if data[1] == "附奖扭蛋" or data[2].find("复刻") != -1:
+            if data[6] != 0 and data[0] < 50000:
                 wf.write("复刻")
             elif 40000 <= data[0] < 50000:
                 wf.write("3★概率2倍")

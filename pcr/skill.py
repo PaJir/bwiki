@@ -24,7 +24,7 @@ def attackPattern(unit_id, cur):
     starts = list()
     loops = list()
     idx = ["①", "②", "③", "④"]
-    sql = "SELECT * FROM unit_attack_pattern WHERE unit_id=" + \
+    sql = "SELECT pattern_id , unit_id , loop_start , loop_end , atk_pattern_1 , atk_pattern_2 , atk_pattern_3 , atk_pattern_4 , atk_pattern_5 , atk_pattern_6 , atk_pattern_7 , atk_pattern_8 , atk_pattern_9 , atk_pattern_10 , atk_pattern_11 , atk_pattern_12 , atk_pattern_13 , atk_pattern_14 , atk_pattern_15 , atk_pattern_16 , atk_pattern_17 , atk_pattern_18 , atk_pattern_19 , atk_pattern_20 FROM unit_attack_pattern WHERE unit_id=" + \
         str(unit_id) + \
         " ORDER BY pattern_id"
     cur.execute(sql)
